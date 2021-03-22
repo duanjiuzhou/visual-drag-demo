@@ -15,7 +15,8 @@ const Canvas = () => {
     componentsMeta,
     isClickComponent,
     setIsClickComponent,
-    setActiveComponentIndex,
+    // setActiveComponentIndex,
+    setCurComponent,
   } = useDesigner()
   const handleDragOver = useCallback((e) => {
     e.preventDefault()
@@ -32,7 +33,10 @@ const Canvas = () => {
       }
       const { uiSchema, showName } = componentsMeta[key]
       const defaultValue = getDefaultValue(uiSchema)
-      const [width, height] = [defaultValue.width || 300, defaultValue.height || 300]
+      const [width, height] = [
+        defaultValue.width || 300,
+        defaultValue.height || 300,
+      ]
       console.log('handleDrop', key, e, e.nativeEvent, e.nativeEvent.offsetX)
 
       addComponent({
@@ -62,9 +66,10 @@ const Canvas = () => {
 
   const handleMouseUp = useCallback(() => {
     if (!isClickComponent) {
-      setActiveComponentIndex(undefined)
+      // setActiveComponentIndex(undefined)
+      setCurComponent(undefined)
     }
-  }, [isClickComponent, setActiveComponentIndex])
+  }, [isClickComponent, setCurComponent])
 
   return (
     <div

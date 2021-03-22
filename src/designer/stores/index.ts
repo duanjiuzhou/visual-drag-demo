@@ -23,17 +23,23 @@ function Designer(state = initialState) {
     );
     // 当前激活的组件索引，0为根节点
     const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>(0);
+    // 当前激活的组件
+    const [curComponent, setCurComponent] = useState<IComponentInstance>();
     // 组件是否处于点击状态
     const [isClickComponent, setIsClickComponent] = useState(false)
 
     // 添加组件
-    const addComponent = useCallback((componentInstance: IComponentInstance) => {
-        componentInstance.id = uuid()
-        console.log('添加组件', componentInstance)
-        setComponentsInstance((_) => {
-            return [..._, componentInstance];
-        });
-    }, [])
+    const addComponent = useCallback((componentInstance: IComponentInstance, index?: number) => {
+        if (index !== undefined) {
+            componentsInstance.splice(index, 0, componentInstance);
+        } else {
+            componentInstance.id = uuid()
+            console.log('添加组件', componentInstance)
+            setComponentsInstance((_) => {
+                return [..._, componentInstance];
+            });
+        }
+    }, [componentsInstance])
 
     // 更新指定组件
     const updateComponent = useCallback((id: string, c: Partial<IComponentInstance>) => {
@@ -48,7 +54,22 @@ function Designer(state = initialState) {
         });
     }, []);
 
-    return { mode, setMode, componentsInstance, addComponent, componentsMeta, setComponentsMeta, updateComponent, activeComponentIndex, setActiveComponentIndex, isClickComponent, setIsClickComponent }
+    // 更新当前激活的组件
+    const updateCurComponent = useCallback((c: Partial<IComponentInstance>) => {
+        setCurComponent((_) => {
+            if (!_) {
+                return
+            }
+            return { ..._, ...c }
+        })
+    }, []);
+
+    return {
+        mode, setMode, componentsInstance, addComponent,
+        componentsMeta, setComponentsMeta, updateComponent,
+        activeComponentIndex, setActiveComponentIndex, isClickComponent,
+        setIsClickComponent, curComponent, updateCurComponent, setCurComponent
+    }
 }
 
 const DesignerStore = createContainer(Designer)

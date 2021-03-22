@@ -73,3 +73,20 @@ export function flatten(data: Record<string, any>) {
     recurse(data, "");
     return result;
 }
+
+export function deepCopy(target: object) {
+    if (typeof target === 'object') {
+        const result: any = Array.isArray(target) ? [] : {}
+        for (const key in target) {
+            if (typeof target[key] === 'object') {
+                result[key] = deepCopy(target[key])
+            } else {
+                result[key] = target[key]
+            }
+        }
+
+        return result
+    }
+
+    return target
+}

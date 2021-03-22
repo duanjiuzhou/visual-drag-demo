@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 
 // rc
 import { Button, Tabs, Radio } from 'antd'
@@ -35,20 +35,19 @@ const Wrap = styled.div`
 `
 
 const ProCodePanel = () => {
-  const { activeComponentIndex, componentsInstance, updateComponent } = useDesigner()
+  const { curComponent, updateComponent } = useDesigner()
 
   const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
+    () => curComponent || ({} as IComponentInstance),
+    [curComponent]
   )
 
   return (
     <JsonEditor
       value={activeComponent}
-      onSave={(value) => updateComponent(activeComponent.id, value as IComponentInstance)}
+      onSave={(value) =>
+        updateComponent(activeComponent.id, value as IComponentInstance)
+      }
     />
   )
 }
@@ -74,7 +73,11 @@ const EditModeSwitch = (props: {
 }
 
 const SettingPanel = () => {
-  const { activeComponentIndex, componentsInstance } = useDesigner()
+  const {
+    curComponent,
+    activeComponentIndex,
+    componentsInstance,
+  } = useDesigner()
 
   const [editMode, setEditMode] = useState<IEditMode>('nocode') // 编辑态模式，
 
@@ -83,11 +86,8 @@ const SettingPanel = () => {
   }, [])
 
   const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
+    () => curComponent || ({} as IComponentInstance),
+    [curComponent]
   )
 
   if (componentsInstance.length === 0) {
@@ -117,7 +117,10 @@ const SettingPanel = () => {
           当前选中组件:{activeComponent.name || ''} <br />
           版本：{activeComponent.version}
         </span>
-        <EditModeSwitch onUpdateEditMode={onUpdateEditMode} editMode={editMode} />
+        <EditModeSwitch
+          onUpdateEditMode={onUpdateEditMode}
+          editMode={editMode}
+        />
         {/* <Button type="link" size="small" onClick={showGlobalConfig}> */}
         <Button type="link" size="small">
           返回舞台配置

@@ -7,7 +7,8 @@ import { useDesigner } from '../../../stores'
 import { IComponentInstance } from '@src/designer/types'
 
 // utils
-// import throttle from 'lodash-es/throttle'
+import { deepCopy } from '@src/designer/utils'
+import debounce from 'lodash-es/debounce'
 
 interface ShapeProps {
   children: React.ReactNode
@@ -21,13 +22,30 @@ interface ShapeProps {
 function Shape(props: ShapeProps) {
   const { children, box, id, index } = props
   const { top, left, width, height, zIndex, rotate = 0 } = box
-  const { updateComponent, setIsClickComponent, setActiveComponentIndex } = useDesigner()
+  const {
+    updateComponent,
+    setIsClickComponent,
+    updateCurComponent,
+    componentsInstance,
+    setActiveComponentIndex,
+    setCurComponent,
+  } = useDesigner()
+
+  const handleUpdateCurComponent = debounce(
+    (pos: IComponentInstance['box']) => {
+      updateCurComponent({
+        box: pos,
+      })
+    },
+    10
+  )
 
   const handleMouseDownOnShape = useCallback(
     (e) => {
       setIsClickComponent(true)
       e.stopPropagation()
       setActiveComponentIndex(index)
+      setCurComponent(deepCopy(componentsInstance[index]))
       const pos = { ...box }
       const startY = e.clientY
       const startX = e.clientX
@@ -44,6 +62,8 @@ function Shape(props: ShapeProps) {
         const style = e.target.style
         style.top = `${pos.top}px`
         style.left = `${pos.left}px`
+
+        handleUpdateCurComponent(pos)
 
         // 修改当前组件样式
         // updateComponent(id, {
@@ -65,6 +85,7 @@ function Shape(props: ShapeProps) {
         updateComponent(id, {
           box: pos,
         })
+
         document.removeEventListener('mousemove', move)
         document.removeEventListener('mouseup', up)
       }
@@ -72,7 +93,17 @@ function Shape(props: ShapeProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, id, index, setActiveComponentIndex, setIsClickComponent, updateComponent]
+    [
+      box,
+      componentsInstance,
+      handleUpdateCurComponent,
+      id,
+      index,
+      setActiveComponentIndex,
+      setCurComponent,
+      setIsClickComponent,
+      updateComponent,
+    ]
   )
 
   return (

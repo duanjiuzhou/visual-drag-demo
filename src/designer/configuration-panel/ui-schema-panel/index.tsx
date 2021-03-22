@@ -13,25 +13,20 @@ const Wrap = styled.div`
 `
 
 const UISchemaPanel = () => {
-  const {
-    activeComponentIndex,
-    componentsInstance,
-    componentsMeta,
-    updateComponent,
-  } = useDesigner()
+  const { curComponent, componentsMeta, updateComponent } = useDesigner()
 
   const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
+    () => curComponent || ({} as IComponentInstance),
+    [curComponent]
   )
 
   const { id, box, props, type } = activeComponent
 
   const { config, defaultValue } = useMemo(() => {
-    const _config = { ...BaseSchema, ...(type ? componentsMeta[type].uiSchema! : {}) }
+    const _config = {
+      ...BaseSchema,
+      ...(type ? componentsMeta[type].uiSchema! : {}),
+    }
 
     // 递归处理字段，当前逻辑不完整
     const _defaultValue = getDefaultValue(_config)
@@ -39,7 +34,10 @@ const UISchemaPanel = () => {
     // 将props传参抹平
     const _props = flatten(props)
 
-    return { config: _config, defaultValue: { ..._defaultValue, ...box, ..._props } }
+    return {
+      config: _config,
+      defaultValue: { ..._defaultValue, ...box, ..._props },
+    }
   }, [box, componentsMeta, props, type])
 
   return (
@@ -48,7 +46,15 @@ const UISchemaPanel = () => {
         value={defaultValue}
         config={config}
         successCB={(allValues: any) => {
-          const { width, height, top, left, rotate, zIndex, ..._props } = allValues
+          const {
+            width,
+            height,
+            top,
+            left,
+            rotate,
+            zIndex,
+            ..._props
+          } = allValues
           updateComponent(id, {
             box: { ...box, width, height, top, left, rotate, zIndex },
             props: { ...props, ...unFlatten(_props) },
