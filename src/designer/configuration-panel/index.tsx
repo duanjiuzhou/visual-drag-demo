@@ -35,11 +35,18 @@ const Wrap = styled.div`
 `
 
 const ProCodePanel = () => {
-  const { curComponent, updateComponent } = useDesigner()
+  const {
+    activeComponentIndex,
+    componentsInstance,
+    updateComponent,
+  } = useDesigner()
 
   const activeComponent = useMemo(
-    () => curComponent || ({} as IComponentInstance),
-    [curComponent]
+    () =>
+      activeComponentIndex !== undefined
+        ? componentsInstance[activeComponentIndex]
+        : ({} as IComponentInstance),
+    [activeComponentIndex, componentsInstance]
   )
 
   return (
@@ -73,11 +80,7 @@ const EditModeSwitch = (props: {
 }
 
 const SettingPanel = () => {
-  const {
-    curComponent,
-    activeComponentIndex,
-    componentsInstance,
-  } = useDesigner()
+  const { activeComponentIndex, componentsInstance } = useDesigner()
 
   const [editMode, setEditMode] = useState<IEditMode>('nocode') // 编辑态模式，
 
@@ -86,29 +89,27 @@ const SettingPanel = () => {
   }, [])
 
   const activeComponent = useMemo(
-    () => curComponent || ({} as IComponentInstance),
-    [curComponent]
+    () =>
+      activeComponentIndex !== undefined
+        ? componentsInstance[activeComponentIndex]
+        : ({} as IComponentInstance),
+    [activeComponentIndex, componentsInstance]
   )
 
   if (componentsInstance.length === 0) {
     return <Wrap />
   }
 
-  if (activeComponentIndex === 0 && componentsInstance[0]) {
-    return (
-      <Wrap>
-        <div className="header">
-          <span>舞台配置</span>
-        </div>
-        <UISchemaPanel />
-      </Wrap>
-    )
-  }
-
-  if (!componentsInstance) {
-    return <div>组件不存在</div>
-  }
-  console.log('数据')
+  // if (activeComponentIndex === 0 && componentsInstance[0]) {
+  //   return (
+  //     <Wrap>
+  //       <div className="header">
+  //         <span>舞台配置</span>
+  //       </div>
+  //       <UISchemaPanel />
+  //     </Wrap>
+  //   )
+  // }
 
   return (
     <Wrap>

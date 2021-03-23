@@ -13,11 +13,19 @@ const Wrap = styled.div`
 `
 
 const UISchemaPanel = () => {
-  const { curComponent, componentsMeta, updateComponent } = useDesigner()
+  const {
+    activeComponentIndex,
+    componentsInstance,
+    componentsMeta,
+    updateComponent,
+  } = useDesigner()
 
   const activeComponent = useMemo(
-    () => curComponent || ({} as IComponentInstance),
-    [curComponent]
+    () =>
+      activeComponentIndex !== undefined
+        ? componentsInstance[activeComponentIndex]
+        : ({} as IComponentInstance),
+    [activeComponentIndex, componentsInstance]
   )
 
   const { id, box, props, type } = activeComponent

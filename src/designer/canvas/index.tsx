@@ -15,8 +15,7 @@ const Canvas = () => {
     componentsMeta,
     isClickComponent,
     setIsClickComponent,
-    // setActiveComponentIndex,
-    setCurComponent,
+    setActiveComponentIndex,
   } = useDesigner()
   const handleDragOver = useCallback((e) => {
     e.preventDefault()
@@ -66,10 +65,9 @@ const Canvas = () => {
 
   const handleMouseUp = useCallback(() => {
     if (!isClickComponent) {
-      // setActiveComponentIndex(undefined)
-      setCurComponent(undefined)
+      setActiveComponentIndex(undefined)
     }
-  }, [isClickComponent, setCurComponent])
+  }, [isClickComponent, setActiveComponentIndex])
 
   return (
     <div

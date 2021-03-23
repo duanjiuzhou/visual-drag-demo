@@ -6,10 +6,6 @@ import { useDesigner } from '../../../stores'
 // type
 import { IComponentInstance } from '@src/designer/types'
 
-// utils
-import { deepCopy } from '@src/designer/utils'
-import debounce from 'lodash-es/debounce'
-
 interface ShapeProps {
   children: React.ReactNode
   id: string
@@ -25,27 +21,14 @@ function Shape(props: ShapeProps) {
   const {
     updateComponent,
     setIsClickComponent,
-    updateCurComponent,
-    componentsInstance,
     setActiveComponentIndex,
-    setCurComponent,
   } = useDesigner()
-
-  const handleUpdateCurComponent = debounce(
-    (pos: IComponentInstance['box']) => {
-      updateCurComponent({
-        box: pos,
-      })
-    },
-    10
-  )
 
   const handleMouseDownOnShape = useCallback(
     (e) => {
       setIsClickComponent(true)
       e.stopPropagation()
       setActiveComponentIndex(index)
-      setCurComponent(deepCopy(componentsInstance[index]))
       const pos = { ...box }
       const startY = e.clientY
       const startX = e.clientX
@@ -62,8 +45,6 @@ function Shape(props: ShapeProps) {
         const style = e.target.style
         style.top = `${pos.top}px`
         style.left = `${pos.left}px`
-
-        handleUpdateCurComponent(pos)
 
         // 修改当前组件样式
         // updateComponent(id, {
@@ -95,12 +76,9 @@ function Shape(props: ShapeProps) {
     },
     [
       box,
-      componentsInstance,
-      handleUpdateCurComponent,
       id,
       index,
       setActiveComponentIndex,
-      setCurComponent,
       setIsClickComponent,
       updateComponent,
     ]

@@ -35,11 +35,18 @@ for (const param in DataConfig) {
 }
 
 const DataSchemaPanel = () => {
-  const { curComponent, updateComponent } = useDesigner()
+  const {
+    activeComponentIndex,
+    componentsInstance,
+    updateComponent,
+  } = useDesigner()
 
   const activeComponent = useMemo(
-    () => curComponent || ({} as IComponentInstance),
-    [curComponent]
+    () =>
+      activeComponentIndex !== undefined
+        ? componentsInstance[activeComponentIndex]
+        : ({} as IComponentInstance),
+    [activeComponentIndex, componentsInstance]
   )
 
   const { id } = activeComponent
