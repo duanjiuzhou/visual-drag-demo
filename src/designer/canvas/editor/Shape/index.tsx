@@ -10,13 +10,14 @@ interface ShapeProps {
   children: React.ReactNode
   id: string
   index: number
+  active: boolean
   box: IComponentInstance['box']
   // children: React.ReactElement
   // children: JSX.Element
 }
 
 function Shape(props: ShapeProps) {
-  const { children, box, id, index } = props
+  const { children, box, id, index, active } = props
   const { top, left, width, height, zIndex, rotate = 0 } = box
   const {
     updateComponent,
@@ -95,6 +96,7 @@ function Shape(props: ShapeProps) {
         height,
         zIndex,
         transform: `rotate(${rotate}deg)`,
+        border: active ? '1px solid red' : 'none',
       }}
     >
       {children}
