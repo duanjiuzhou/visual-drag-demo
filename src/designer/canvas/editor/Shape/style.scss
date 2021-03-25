@@ -1,0 +1,15 @@
+.shape-wrap {
+  position: absolute;
+  &:hover {
+    cursor: move;
+  }
+  .shape-point {
+    position: absolute;
+    z-index: 1;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border: 1px solid #59c7f9;
+    border-radius: 50%;
+  }
+}

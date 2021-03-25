@@ -26,7 +26,12 @@ const ComponentList = () => {
             key={item.key}
             draggable={true}
             data-index={item.key}
-            style={{ width: '100px', height: '35px', border: '1px solid', margin: '5px' }}
+            style={{
+              width: '100px',
+              height: '35px',
+              border: '1px solid',
+              margin: '5px',
+            }}
           >
             {showName}
           </div>

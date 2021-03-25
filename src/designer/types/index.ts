@@ -42,7 +42,7 @@ export interface IComponentInstance<T = any> {
         left: number;
         top: number;
         zIndex: number;
-        rotate?: number;
+        rotate: number;
     }; // 定位参数 
     style?: {
         style: React.CSSProperties;

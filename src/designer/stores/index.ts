@@ -37,6 +37,8 @@ function Designer(state = initialState) {
 
     // 更新指定组件
     const updateComponent = useCallback((id: string, c: Partial<IComponentInstance>) => {
+        console.log('更新指定组件', c);
+
         setComponentsInstance((_) => {
             const index = _.findIndex((item) => item.id === id);
             if (index === -1) {
