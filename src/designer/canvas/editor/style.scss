@@ -4,3 +4,30 @@
   height: 700px;
   margin: auto;
 }
+
+.grid-wrap {
+  // position: absolute;
+  // width: 100%;
+  // height: 100%;
+  // top: 0;
+  // left: 0;
+  // bottom: 0;
+  // right: 0;
+  background-color: rgb(242, 242, 242);
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      -90deg,
+      rgba(0, 0, 0, 0.04),
+      rgba(0, 0, 0, 0.04) 1px,
+      transparent 1px,
+      transparent 20px
+    );
+  background-position: 1px 1px;
+  background-size: 10px 10px;
+}

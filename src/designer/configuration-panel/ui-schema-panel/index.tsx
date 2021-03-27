@@ -42,10 +42,11 @@ const UISchemaPanel = () => {
     // 将props传参抹平
     const _props = flatten(props)
 
-    return {
+    const result = {
       config: _config,
-      defaultValue: { ..._defaultValue, ...box, ..._props },
+      defaultValue: { ..._defaultValue, ..._props, ...box },
     }
+    return result
   }, [box, componentsMeta, props, type])
 
   return (

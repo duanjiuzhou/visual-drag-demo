@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// stores
-import { useDesigner } from '../../../stores'
-
 // utils
-import { mod360 } from '@src/designer/utils/translate'
-
-// type
-import { IComponentInstance } from '@src/designer/types'
+import { mod360 } from './utils/translate'
 
 // css
 import './style.scss'
@@ -36,26 +30,34 @@ const angleToCursor = [
   { start: 248, end: 293, cursor: 'sw' },
   { start: 293, end: 338, cursor: 'w' },
 ]
+const dataIndex = 'drag-shape-point'
 
-interface ShapeProps {
-  children: React.ReactNode // React.ReactElement JSX.Element
-  id: string
-  index: number
-  active: boolean
-  box: IComponentInstance['box']
+interface boxProps {
+  width: number
+  height: number
+  left: number
+  top: number
+  zIndex: number
+  rotate: number
 }
 
-function Shape(props: ShapeProps) {
-  const { children, box, id, index, active } = props
+interface DragProps {
+  children: React.ReactNode // React.ReactElement JSX.Element
+  id?: string
+  index?: number
+  active: boolean
+  box: boxProps
+  onDragStart?: (box: boxProps) => void
+  onDrag?: (box: boxProps) => void
+  onDragEnd?: (box: boxProps) => void
+}
+
+function Drag(props: DragProps) {
+  const { children, box, active, onDrag, onDragStart, onDragEnd } = props
   const [boxStyle, setBoxStyle] = useState({
     width: box.width,
     height: box.height,
   })
-  const {
-    updateComponent,
-    setIsClickComponent,
-    setActiveComponentIndex,
-  } = useDesigner()
   const [cursors, setCursors] = useState<Record<string, string>>({})
   const shapeEl = useRef<any>()
 
@@ -131,7 +133,8 @@ function Shape(props: ShapeProps) {
 
   const handleMouseDownOnPoint = useCallback(
     (point: string, e) => {
-      setIsClickComponent(true)
+      onDragStart && onDragStart(box)
+      // setIsClickComponent(true)
       e.stopPropagation()
       e.preventDefault()
 
@@ -175,13 +178,15 @@ function Shape(props: ShapeProps) {
         shapeElStyle.height = `${pos.height}px`
 
         setBoxStyle({ width: pos.width, height: pos.height })
+        onDrag && onDrag(pos)
       }
 
       const up = () => {
         // 修改当前组件样式
-        updateComponent(id, {
-          box: pos,
-        })
+        // updateComponent(id, {
+        //   box: pos,
+        // })
+        onDragEnd && onDragEnd(pos)
 
         document.removeEventListener('mousemove', move)
         document.removeEventListener('mouseup', up)
@@ -190,19 +195,20 @@ function Shape(props: ShapeProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, setIsClickComponent]
+    [box, onDrag, onDragEnd, onDragStart]
   )
 
   const handleMouseDownOnShape = useCallback(
     (e) => {
       shapeEl.current = e
-      if (e.target.dataset.index === 'shape-point') {
+      if (e.target.dataset.index === dataIndex) {
         return
       }
+      onDragStart && onDragStart(box)
+      // setIsClickComponent(true)
+      // setActiveComponentIndex(index)
 
-      setIsClickComponent(true)
       e.stopPropagation()
-      setActiveComponentIndex(index)
       const pos = { ...box }
       const startY = e.clientY
       const startX = e.clientX
@@ -219,27 +225,15 @@ function Shape(props: ShapeProps) {
         const style = e.target.style
         style.top = `${pos.top}px`
         style.left = `${pos.left}px`
-
-        // 修改当前组件样式
-        // updateComponent(id, {
-        //   box: pos,
-        // })
-        // 等更新完当前组件的样式并绘制到屏幕后再判断是否需要吸附
-        // 如果不使用 $nextTick，吸附后将无法移动
-        // this.$nextTick(() => {
-        //   // 触发元素移动事件，用于显示标线、吸附功能
-        //   // 后面两个参数代表鼠标移动方向
-        //   // curY - startY > 0 true 表示向下移动 false 表示向上移动
-        //   // curX - startX > 0 true 表示向右移动 false 表示向左移动
-        //   eventBus.$emit('move', curY - startY > 0, curX - startX > 0)
-        // })
+        onDrag && onDrag(pos)
       }
 
       const up = () => {
         // 修改当前组件样式
-        updateComponent(id, {
-          box: pos,
-        })
+        // updateComponent(id, {
+        //   box: pos,
+        // })
+        onDragEnd && onDragEnd(pos)
 
         document.removeEventListener('mousemove', move)
         document.removeEventListener('mouseup', up)
@@ -248,14 +242,7 @@ function Shape(props: ShapeProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [
-      box,
-      id,
-      index,
-      setActiveComponentIndex,
-      setIsClickComponent,
-      updateComponent,
-    ]
+    [box, onDrag, onDragEnd, onDragStart]
   )
 
   useEffect(() => {
@@ -270,7 +257,7 @@ function Shape(props: ShapeProps) {
 
   return (
     <div
-      className="shape-wrap"
+      className="drag-shape-wrap"
       onMouseDown={handleMouseDownOnShape}
       style={{
         top: box.top,
@@ -285,10 +272,10 @@ function Shape(props: ShapeProps) {
       {active &&
         pointList.map((item) => (
           <div
-            className="shape-point"
+            className="drag-shape-point"
             key={item}
             style={getPointStyle(item)}
-            data-index={'shape-point'}
+            data-index={dataIndex}
             onMouseDown={handleMouseDownOnPoint.bind(null, item)}
           ></div>
         ))}
@@ -297,4 +284,4 @@ function Shape(props: ShapeProps) {
   )
 }
 
-export default Shape
+export default Drag

@@ -1,9 +1,10 @@
-.shape-wrap {
+.drag-shape-wrap {
   position: absolute;
   &:hover {
     cursor: move;
+    user-select: none;
   }
-  .shape-point {
+  .drag-shape-point {
     position: absolute;
     z-index: 1;
     width: 8px;

@@ -1,11 +1,13 @@
-import { useCallback, Suspense } from 'react'
+import { Suspense, useCallback } from 'react'
 
 // rc
-import Grid from './Grid'
-import Shape from './Shape'
+import Drag from '../../drag'
 
 // stores
 import { useDesigner } from '../../stores'
+
+// type
+import { IComponentInstance } from '@src/designer/types'
 
 // css
 import './style.scss'
@@ -15,29 +17,49 @@ const Editor = () => {
     componentsInstance,
     componentsMeta,
     activeComponentIndex,
+    updateComponent,
+    setIsClickComponent,
+    setActiveComponentIndex,
   } = useDesigner()
 
-  const handleMouseDown = useCallback((e) => {
-    console.log('handleMouseDown', e)
-  }, [])
+  const onDragStart = useCallback(
+    (index: number) => {
+      console.log('onDragStart')
+
+      setIsClickComponent(true)
+      setActiveComponentIndex(index)
+    },
+    [setActiveComponentIndex, setIsClickComponent]
+  )
+
+  const onDragEnd = useCallback(
+    (box: IComponentInstance['box'], id: string) => {
+      console.log('onDragEnd')
+      updateComponent(id, { box })
+    },
+    [updateComponent]
+  )
 
   return (
-    <div className="editor-wrap" onMouseDown={handleMouseDown}>
-      <Grid />
+    <div className="editor-wrap grid-wrap">
       {componentsInstance.map((item, index) => {
-        const { type, props, box } = item
+        const { type, props, box, id } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
-        const id =
+        const activeId =
           activeComponentIndex !== undefined
-            ? componentsInstance[activeComponentIndex!].id
+            ? componentsInstance[activeComponentIndex].id
             : ''
         return (
-          <Shape
-            key={item.id}
-            id={item.id}
-            active={item.id === id}
+          <Drag
+            key={id}
+            active={id === activeId}
             box={box}
-            index={index}
+            onDragStart={() => {
+              onDragStart(index)
+            }}
+            onDragEnd={(dragBox) => {
+              onDragEnd(dragBox, id)
+            }}
           >
             <Suspense fallback={suspenseFallback}>
               <div
@@ -46,7 +68,7 @@ const Editor = () => {
                 <C {...props} />
               </div>
             </Suspense>
-          </Shape>
+          </Drag>
         )
       })}
     </div>

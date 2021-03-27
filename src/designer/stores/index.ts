@@ -22,7 +22,7 @@ function Designer(state = initialState) {
         state.componentsMeta || {}
     );
     // 当前激活的组件索引，0为根节点
-    const [activeComponentIndex, setActiveComponentIndex] = useState<number>();
+    const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>();
     // 组件是否处于点击状态
     const [isClickComponent, setIsClickComponent] = useState(false)
 

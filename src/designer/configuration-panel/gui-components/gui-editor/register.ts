@@ -9,7 +9,7 @@ import GroupControl from "../group";
 import SwitchControl from "../switch";
 import CheckboxControl from "../checkbox";
 
-export const transform2AntdFields: { [key: string]: any } = {
+export const transform2AntdFields: Record<string, any> = {
   text: Input,
   boolean: BooleanControl,
   number: InputNumber,

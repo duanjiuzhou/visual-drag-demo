@@ -36,7 +36,6 @@ const Canvas = () => {
         defaultValue.width || 300,
         defaultValue.height || 300,
       ]
-      console.log('handleDrop', key, e, e.nativeEvent, e.nativeEvent.offsetX)
 
       addComponent({
         id: '',
@@ -54,7 +53,6 @@ const Canvas = () => {
         props: { ...unFlatten(defaultValue), width, height },
         dataSource: componentsMeta[key].dataSchema || {},
       })
-      // const component = deepCopy(componentList[e.dataTransfer.getData('index')])
     },
     [addComponent, componentsMeta]
   )
