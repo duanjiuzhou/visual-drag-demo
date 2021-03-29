@@ -59,7 +59,7 @@ function Drag(props: DragProps) {
     height: box.height,
   })
   const [cursors, setCursors] = useState<Record<string, string>>({})
-  const shapeEl = useRef<any>()
+  const shapeEl = useRef<HTMLDivElement>(null)
 
   const getPointStyle = useCallback(
     (point: string) => {
@@ -134,7 +134,6 @@ function Drag(props: DragProps) {
   const handleMouseDownOnPoint = useCallback(
     (point: string, e) => {
       onDragStart && onDragStart(box)
-      // setIsClickComponent(true)
       e.stopPropagation()
       e.preventDefault()
 
@@ -171,11 +170,13 @@ function Drag(props: DragProps) {
         pos.left = _left + (hasL ? disX : 0)
         pos.top = _top + (hasT ? disY : 0)
 
-        const shapeElStyle = shapeEl.current.target.style
-        shapeElStyle.top = `${pos.top}px`
-        shapeElStyle.left = `${pos.left}px`
-        shapeElStyle.width = `${pos.width}px`
-        shapeElStyle.height = `${pos.height}px`
+        if (shapeEl.current) {
+          const shapeElStyle = shapeEl.current.style
+          shapeElStyle.top = `${pos.top}px`
+          shapeElStyle.left = `${pos.left}px`
+          shapeElStyle.width = `${pos.width}px`
+          shapeElStyle.height = `${pos.height}px`
+        }
 
         setBoxStyle({ width: pos.width, height: pos.height })
         onDrag && onDrag(pos)
@@ -183,9 +184,6 @@ function Drag(props: DragProps) {
 
       const up = () => {
         // 修改当前组件样式
-        // updateComponent(id, {
-        //   box: pos,
-        // })
         onDragEnd && onDragEnd(pos)
 
         document.removeEventListener('mousemove', move)
@@ -198,17 +196,68 @@ function Drag(props: DragProps) {
     [box, onDrag, onDragEnd, onDragStart]
   )
 
+  const handleRotate = useCallback(
+    (e) => {
+      onDragStart && onDragStart(box)
+      e.stopPropagation()
+      e.preventDefault()
+
+      // 初始坐标和初始角度
+      const pos = { ...box }
+      const startY = e.clientY
+      const startX = e.clientX
+      const startRotate = pos.rotate
+
+      // 获取元素中心点位置
+      const rect = shapeEl.current!.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      // 旋转前的角度
+      const rotateDegreeBefore =
+        Math.atan2(startY - centerY, startX - centerX) / (Math.PI / 180)
+
+      const move = (moveEvent: MouseEvent) => {
+        const curX = moveEvent.clientX
+        const curY = moveEvent.clientY
+        // 旋转后的角度
+        const rotateDegreeAfter =
+          Math.atan2(curY - centerY, curX - centerX) / (Math.PI / 180)
+        // 获取旋转的角度值
+        pos.rotate = Math.round(
+          startRotate + rotateDegreeAfter - rotateDegreeBefore
+        )
+
+        // 修改当前组件样式
+        if (shapeEl.current) {
+          const shapeElStyle = shapeEl.current.style
+          shapeElStyle.transform = `rotate(${pos.rotate}deg)`
+        }
+        onDrag && onDrag(pos)
+      }
+
+      const up = () => {
+        // 修改当前组件样式
+        onDragEnd && onDragEnd(pos)
+        document.removeEventListener('mousemove', move)
+        document.removeEventListener('mouseup', up)
+        // setCursors(getCursor()) // 根据旋转角度获取光标位置
+      }
+
+      document.addEventListener('mousemove', move)
+      document.addEventListener('mouseup', up)
+    },
+    [box, onDrag, onDragEnd, onDragStart]
+  )
+
   const handleMouseDownOnShape = useCallback(
     (e) => {
-      shapeEl.current = e
       if (e.target.dataset.index === dataIndex) {
         return
       }
       onDragStart && onDragStart(box)
-      // setIsClickComponent(true)
-      // setActiveComponentIndex(index)
-
       e.stopPropagation()
+
       const pos = { ...box }
       const startY = e.clientY
       const startX = e.clientX
@@ -229,12 +278,7 @@ function Drag(props: DragProps) {
       }
 
       const up = () => {
-        // 修改当前组件样式
-        // updateComponent(id, {
-        //   box: pos,
-        // })
         onDragEnd && onDragEnd(pos)
-
         document.removeEventListener('mousemove', move)
         document.removeEventListener('mouseup', up)
       }
@@ -259,6 +303,7 @@ function Drag(props: DragProps) {
     <div
       className="drag-shape-wrap"
       onMouseDown={handleMouseDownOnShape}
+      ref={shapeEl}
       style={{
         top: box.top,
         left: box.left,
@@ -269,16 +314,43 @@ function Drag(props: DragProps) {
         outline: active ? '1px solid #70c0ff' : 'none',
       }}
     >
-      {active &&
-        pointList.map((item) => (
-          <div
-            className="drag-shape-point"
-            key={item}
-            style={getPointStyle(item)}
-            data-index={dataIndex}
-            onMouseDown={handleMouseDownOnPoint.bind(null, item)}
-          ></div>
-        ))}
+      {active && (
+        <>
+          <span>
+            <svg
+              onMouseDown={handleRotate}
+              data-index={dataIndex}
+              className="drag-shape-rotate"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="3070"
+            >
+              <path
+                d="M512 957.671444c-237.936053 0-431.558986-193.622933-431.558986-431.558985S274.063947 94.553473 512 94.553473c86.368247 0 169.914002 25.402426 241.323043 73.667034 14.112459 9.596472 18.063947 28.789416 8.467475 43.184124-9.596472 14.112459-28.789416 18.063947-43.184123 8.467475-60.965821-41.208379-132.657111-63.223815-206.606395-63.223815-203.783903 0-369.464168 165.680265-369.464168 369.464168s165.680265 369.464168 369.464168 369.464167c98.787211 0 191.364939-38.385888 261.362734-108.101433s108.101433-162.575524 108.101434-261.362734c0-17.2172 13.830209-31.047409 31.047409-31.047409s31.047409 13.830209 31.047409 31.047409c0 115.157663-44.877619 223.541345-126.44763 305.111356s-189.953693 126.44763-305.111356 126.447629z"
+                p-id="3071"
+              ></path>
+              <path
+                d="M822.191841 257.693495c-16.652701 8.185226-36.974642 1.411246-45.442117-15.241455l-77.054024-154.108049c-8.185226-16.652701-1.411246-36.974642 15.241455-45.442117 16.652701-8.185226 36.974642-1.411246 45.442117 15.241456l77.054025 154.108048c8.185226 16.652701 1.411246 36.974642-15.241456 45.442117z"
+                p-id="3072"
+              ></path>
+              <path
+                d="M622.641676 319.506064c-8.185226-16.652701-1.411246-36.974642 15.241455-45.442117l154.108049-77.054024c16.652701-8.185226 36.974642-1.411246 45.442117 15.241455 8.185226 16.652701 1.411246 36.974642-15.241456 45.442117l-154.108048 77.054024c-16.93495 8.185226-37.256891 1.411246-45.442117-15.241455z"
+                p-id="3073"
+              ></path>
+            </svg>
+          </span>
+          {pointList.map((item) => (
+            <div
+              className="drag-shape-point"
+              key={item}
+              style={getPointStyle(item)}
+              data-index={dataIndex}
+              onMouseDown={handleMouseDownOnPoint.bind(null, item)}
+            ></div>
+          ))}
+        </>
+      )}
       {children}
     </div>
   )
