@@ -41,7 +41,7 @@ const Editor = () => {
   )
 
   return (
-    <div className="editor-wrap grid-wrap">
+    <div className="editor-wrap grid-wrap" id="canvas-editor">
       {componentsInstance.map((item, index) => {
         const { type, props, box, id } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
@@ -51,8 +51,9 @@ const Editor = () => {
             : ''
         return (
           <Drag
+            container={'#canvas-editor'}
             key={id}
-            active={id === activeId}
+            isActive={id === activeId}
             box={box}
             onDragStart={() => {
               onDragStart(index)

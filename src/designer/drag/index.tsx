@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // utils
 import { mod360 } from './utils/translate'
+import calculateComponentPositonAndSize from './utils/calculateComponentPositonAndSize'
 
 // css
 import './style.scss'
@@ -42,18 +43,58 @@ interface boxProps {
 }
 
 interface DragProps {
-  children: React.ReactNode // React.ReactElement JSX.Element
-  id?: string
-  index?: number
-  active: boolean
+  /**
+   * @description 画布元素或者画布id (Canvas element or canvas id)
+   * @default
+   */
+  container: string
+  /**
+   * @description 是否处于激活状态，将开启拉伸、旋转功能
+   * @default false
+   */
+  isActive?: boolean
+  /**
+   * @description 是否禁止拖拽
+   * @default false
+   */
+  isStatic?: boolean
+  /**
+   * @description 盒子布局样式
+   * @default
+   */
   box: boxProps
+  /**
+   * @description 子节点
+   * @default
+   */
+  children: React.ReactNode // React.ReactElement JSX.Element
+  /**
+   * @description 拖拽开始事件钩子
+   * @default
+   */
   onDragStart?: (box: boxProps) => void
+  /**
+   * @description 拖拽中事件钩子
+   * @default
+   */
   onDrag?: (box: boxProps) => void
+  /**
+   * @description 拖拽结束事件钩子
+   * @default
+   */
   onDragEnd?: (box: boxProps) => void
 }
 
 function Drag(props: DragProps) {
-  const { children, box, active, onDrag, onDragStart, onDragEnd } = props
+  const {
+    children,
+    box,
+    isActive,
+    container,
+    onDrag,
+    onDragStart,
+    onDragEnd,
+  } = props
   const [boxStyle, setBoxStyle] = useState({
     width: box.width,
     height: box.height,
@@ -137,13 +178,40 @@ function Drag(props: DragProps) {
       e.stopPropagation()
       e.preventDefault()
 
-      const pos = { ...box }
-      const _height = Number(pos.height)
-      const _width = Number(pos.width)
-      const _top = Number(pos.top)
-      const _left = Number(pos.left)
-      const startX = e.clientX
-      const startY = e.clientY
+      const style = { ...box }
+
+      // 组件宽高比
+      const proportion = style.width / style.height
+
+      // 组件中心点
+      const center = {
+        x: style.left + style.width / 2,
+        y: style.top + style.height / 2,
+      }
+
+      // 获取画布位移信息
+      const editorRectInfo = document
+        .querySelector(container)
+        ?.getBoundingClientRect()
+
+      if (!editorRectInfo) {
+        throw new Error('container属性为空，或者获取画布dom失败')
+        // return
+      }
+
+      // 当前点击坐标
+      const curPoint = {
+        x: e.clientX - editorRectInfo.left,
+        y: e.clientY - editorRectInfo.top,
+      }
+
+      // 获取对称点的坐标
+      const symmetricPoint = {
+        x: center.x - (curPoint.x - center.x),
+        y: center.y - (curPoint.y - center.y),
+      }
+
+      const needLockProportion = false
 
       let isFirst = true
 
@@ -155,36 +223,39 @@ function Drag(props: DragProps) {
           return
         }
 
-        const currX = moveEvent.clientX
-        const currY = moveEvent.clientY
-        const disY = currY - startY
-        const disX = currX - startX
-        const hasT = /t/.test(point)
-        const hasB = /b/.test(point)
-        const hasL = /l/.test(point)
-        const hasR = /r/.test(point)
-        const newHeight = _height + (hasT ? -disY : hasB ? disY : 0)
-        const newWidth = _width + (hasL ? -disX : hasR ? disX : 0)
-        pos.height = newHeight > 0 ? newHeight : 0
-        pos.width = newWidth > 0 ? newWidth : 0
-        pos.left = _left + (hasL ? disX : 0)
-        pos.top = _top + (hasT ? disY : 0)
+        const curPositon = {
+          x: moveEvent.clientX - editorRectInfo.left,
+          y: moveEvent.clientY - editorRectInfo.top,
+        }
+
+        calculateComponentPositonAndSize(
+          point,
+          style,
+          curPositon,
+          proportion,
+          needLockProportion,
+          {
+            center,
+            curPoint,
+            symmetricPoint,
+          }
+        )
 
         if (shapeEl.current) {
           const shapeElStyle = shapeEl.current.style
-          shapeElStyle.top = `${pos.top}px`
-          shapeElStyle.left = `${pos.left}px`
-          shapeElStyle.width = `${pos.width}px`
-          shapeElStyle.height = `${pos.height}px`
+          shapeElStyle.top = `${style.top}px`
+          shapeElStyle.left = `${style.left}px`
+          shapeElStyle.width = `${style.width}px`
+          shapeElStyle.height = `${style.height}px`
         }
 
-        setBoxStyle({ width: pos.width, height: pos.height })
-        onDrag && onDrag(pos)
+        setBoxStyle({ width: style.width, height: style.height })
+        onDrag && onDrag(style)
       }
 
       const up = () => {
         // 修改当前组件样式
-        onDragEnd && onDragEnd(pos)
+        onDragEnd && onDragEnd(style)
 
         document.removeEventListener('mousemove', move)
         document.removeEventListener('mouseup', up)
@@ -193,7 +264,7 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, onDrag, onDragEnd, onDragStart]
+    [box, container, onDrag, onDragEnd, onDragStart]
   )
 
   const handleRotate = useCallback(
@@ -294,10 +365,10 @@ function Drag(props: DragProps) {
   }, [box.height, box.width])
 
   useEffect(() => {
-    if (active) {
+    if (isActive) {
       setCursors(getCursor())
     }
-  }, [active, getCursor])
+  }, [isActive, getCursor])
 
   return (
     <div
@@ -311,10 +382,10 @@ function Drag(props: DragProps) {
         height: box.height,
         zIndex: box.zIndex,
         transform: `rotate(${box.rotate}deg)`,
-        outline: active ? '1px solid #70c0ff' : 'none',
+        outline: isActive ? '1px solid #70c0ff' : 'none',
       }}
     >
-      {active && (
+      {isActive && (
         <>
           <span>
             <svg
