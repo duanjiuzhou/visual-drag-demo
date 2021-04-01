@@ -1,7 +1,7 @@
 import { Suspense, useCallback } from 'react'
 
 // rc
-import Drag from '../../drag'
+import Drag, { IShapeStyleType } from '../../drag'
 
 // stores
 import { useDesigner } from '../../stores'
@@ -40,6 +40,18 @@ const Editor = () => {
     [updateComponent]
   )
 
+  const onDrag = useCallback(
+    (
+      shapeStyle: IShapeStyleType,
+      type: 'point' | 'rotate' | 'shape',
+      isDownward?: boolean,
+      isRightward?: boolean
+    ) => {
+      console.log(shapeStyle, type, isDownward, isRightward)
+    },
+    []
+  )
+
   return (
     <div className="editor-wrap grid-wrap" id="canvas-editor">
       {componentsInstance.map((item, index) => {
@@ -54,10 +66,11 @@ const Editor = () => {
             container={'#canvas-editor'}
             key={id}
             isActive={id === activeId}
-            box={box}
+            shapeStyle={box}
             onDragStart={() => {
               onDragStart(index)
             }}
+            onDrag={onDrag}
             onDragEnd={(dragBox) => {
               onDragEnd(dragBox, id)
             }}

@@ -33,7 +33,7 @@ const angleToCursor = [
 ]
 const dataIndex = 'drag-shape-point'
 
-interface boxProps {
+export interface IShapeStyleType {
   width: number
   height: number
   left: number
@@ -42,7 +42,7 @@ interface boxProps {
   rotate: number
 }
 
-interface DragProps {
+export interface DragProps {
   /**
    * @description 画布元素或者画布id (Canvas element or canvas id)
    * @default
@@ -62,7 +62,7 @@ interface DragProps {
    * @description 盒子布局样式
    * @default
    */
-  box: boxProps
+  shapeStyle: IShapeStyleType
   /**
    * @description 子节点
    * @default
@@ -72,23 +72,28 @@ interface DragProps {
    * @description 拖拽开始事件钩子
    * @default
    */
-  onDragStart?: (box: boxProps) => void
+  onDragStart?: (shapeStyle: IShapeStyleType) => void
   /**
    * @description 拖拽中事件钩子
    * @default
    */
-  onDrag?: (box: boxProps) => void
+  onDrag?: (
+    shapeStyle: IShapeStyleType,
+    type: 'point' | 'rotate' | 'shape',
+    isDownward?: boolean,
+    isRightward?: boolean
+  ) => void
   /**
    * @description 拖拽结束事件钩子
    * @default
    */
-  onDragEnd?: (box: boxProps) => void
+  onDragEnd?: (shapeStyle: IShapeStyleType) => void
 }
 
 function Drag(props: DragProps) {
   const {
     children,
-    box,
+    shapeStyle,
     isActive,
     container,
     onDrag,
@@ -96,8 +101,8 @@ function Drag(props: DragProps) {
     onDragEnd,
   } = props
   const [boxStyle, setBoxStyle] = useState({
-    width: box.width,
-    height: box.height,
+    width: shapeStyle.width,
+    height: shapeStyle.height,
   })
   const [cursors, setCursors] = useState<Record<string, string>>({})
   const shapeEl = useRef<HTMLDivElement>(null)
@@ -144,7 +149,7 @@ function Drag(props: DragProps) {
   )
 
   const getCursor = useCallback(() => {
-    const _rotate = mod360(box.rotate) // 取余 360
+    const _rotate = mod360(shapeStyle.rotate) // 取余 360
     const result: Record<string, string> = {}
     let lastMatchIndex = -1 // 从上一个命中的角度的索引开始匹配下一个，降低时间复杂度
 
@@ -170,15 +175,15 @@ function Drag(props: DragProps) {
     })
 
     return result
-  }, [box.rotate])
+  }, [shapeStyle.rotate])
 
   const handleMouseDownOnPoint = useCallback(
     (point: string, e) => {
-      onDragStart && onDragStart(box)
+      onDragStart && onDragStart(shapeStyle)
       e.stopPropagation()
       e.preventDefault()
 
-      const style = { ...box }
+      const style = { ...shapeStyle }
 
       // 组件宽高比
       const proportion = style.width / style.height
@@ -250,7 +255,7 @@ function Drag(props: DragProps) {
         }
 
         setBoxStyle({ width: style.width, height: style.height })
-        onDrag && onDrag(style)
+        onDrag && onDrag(style, 'point')
       }
 
       const up = () => {
@@ -264,17 +269,17 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, container, onDrag, onDragEnd, onDragStart]
+    [shapeStyle, container, onDrag, onDragEnd, onDragStart]
   )
 
   const handleRotate = useCallback(
     (e) => {
-      onDragStart && onDragStart(box)
+      onDragStart && onDragStart(shapeStyle)
       e.stopPropagation()
       e.preventDefault()
 
       // 初始坐标和初始角度
-      const pos = { ...box }
+      const pos = { ...shapeStyle }
       const startY = e.clientY
       const startX = e.clientX
       const startRotate = pos.rotate
@@ -304,7 +309,7 @@ function Drag(props: DragProps) {
           const shapeElStyle = shapeEl.current.style
           shapeElStyle.transform = `rotate(${pos.rotate}deg)`
         }
-        onDrag && onDrag(pos)
+        onDrag && onDrag(pos, 'rotate')
       }
 
       const up = () => {
@@ -318,7 +323,7 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, onDrag, onDragEnd, onDragStart]
+    [shapeStyle, onDrag, onDragEnd, onDragStart]
   )
 
   const handleMouseDownOnShape = useCallback(
@@ -326,10 +331,10 @@ function Drag(props: DragProps) {
       if (e.target.dataset.index === dataIndex) {
         return
       }
-      onDragStart && onDragStart(box)
+      onDragStart && onDragStart(shapeStyle)
       e.stopPropagation()
 
-      const pos = { ...box }
+      const pos = { ...shapeStyle }
       const startY = e.clientY
       const startX = e.clientX
 
@@ -345,7 +350,12 @@ function Drag(props: DragProps) {
         const style = e.target.style
         style.top = `${pos.top}px`
         style.left = `${pos.left}px`
-        onDrag && onDrag(pos)
+
+        // 拖动组件，计算组件移动方向，向下、向右判断， 用于显示标线、吸附功能
+        // 后面两个参数代表鼠标移动方向
+        // curY - startY > 0 true 表示向下移动 false 表示向上移动
+        // curX - startX > 0 true 表示向右移动 false 表示向左移动
+        onDrag && onDrag(pos, 'shape', curY - startY > 0, curX - startX > 0)
       }
 
       const up = () => {
@@ -357,12 +367,12 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [box, onDrag, onDragEnd, onDragStart]
+    [shapeStyle, onDrag, onDragEnd, onDragStart]
   )
 
   useEffect(() => {
-    setBoxStyle({ width: box.width, height: box.height })
-  }, [box.height, box.width])
+    setBoxStyle({ width: shapeStyle.width, height: shapeStyle.height })
+  }, [shapeStyle.height, shapeStyle.width])
 
   useEffect(() => {
     if (isActive) {
@@ -376,12 +386,12 @@ function Drag(props: DragProps) {
       onMouseDown={handleMouseDownOnShape}
       ref={shapeEl}
       style={{
-        top: box.top,
-        left: box.left,
-        width: box.width,
-        height: box.height,
-        zIndex: box.zIndex,
-        transform: `rotate(${box.rotate}deg)`,
+        top: shapeStyle.top,
+        left: shapeStyle.left,
+        width: shapeStyle.width,
+        height: shapeStyle.height,
+        zIndex: shapeStyle.zIndex,
+        transform: `rotate(${shapeStyle.rotate}deg)`,
         outline: isActive ? '1px solid #70c0ff' : 'none',
       }}
     >
