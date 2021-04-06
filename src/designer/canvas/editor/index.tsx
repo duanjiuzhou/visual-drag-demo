@@ -1,7 +1,8 @@
-import { Suspense, useCallback } from 'react'
+import { Suspense, useCallback, useState } from 'react'
 
 // rc
 import Drag, { IShapeStyleType } from '../../drag'
+import MarkLine from '../../markLine'
 
 // stores
 import { useDesigner } from '../../stores'
@@ -21,6 +22,12 @@ const Editor = () => {
     setIsClickComponent,
     setActiveComponentIndex,
   } = useDesigner()
+  const [markLinkState, setMarkLinkState] = useState<{
+    curComponentStyle: IShapeStyleType
+    isDownward: boolean
+    isRightward: boolean
+    isShow: boolean
+  }>({} as any)
 
   const onDragStart = useCallback(
     (index: number) => {
@@ -36,6 +43,12 @@ const Editor = () => {
     (box: IComponentInstance['box'], id: string) => {
       console.log('onDragEnd')
       updateComponent(id, { box })
+      setMarkLinkState({
+        curComponentStyle: box,
+        isDownward: false,
+        isRightward: false,
+        isShow: false,
+      })
     },
     [updateComponent]
   )
@@ -47,10 +60,22 @@ const Editor = () => {
       isDownward?: boolean,
       isRightward?: boolean
     ) => {
-      console.log(shapeStyle, type, isDownward, isRightward)
+      if (type === 'shape') {
+        // console.log(shapeStyle, type, isDownward, isRightward)
+        setMarkLinkState({
+          curComponentStyle: shapeStyle,
+          isDownward: isDownward!,
+          isRightward: isRightward!,
+          isShow: true,
+        })
+      }
     },
     []
   )
+
+  const getShapeOffset = useCallback((key: 'left' | 'top', value: number) => {
+    console.log(key, value)
+  }, [])
 
   return (
     <div className="editor-wrap grid-wrap" id="canvas-editor">
@@ -85,6 +110,12 @@ const Editor = () => {
           </Drag>
         )
       })}
+      <MarkLine
+        getShapeOffset={getShapeOffset}
+        activeComponentIndex={activeComponentIndex!}
+        allComponentStyleList={componentsInstance.map((item) => item.box)}
+        {...markLinkState}
+      />
     </div>
   )
 }
