@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 // utils
 import { mod360 } from './utils/translate'
-import calculateComponentPositonAndSize from './utils/calculateComponentPositonAndSize'
+import calculateComponentPositionAndSize from './utils/calculateComponentPositionAndSize'
 
 // css
 import './style.scss'
@@ -228,15 +228,15 @@ function Drag(props: DragProps) {
           return
         }
 
-        const curPositon = {
+        const curPosition = {
           x: moveEvent.clientX - editorRectInfo.left,
           y: moveEvent.clientY - editorRectInfo.top,
         }
 
-        calculateComponentPositonAndSize(
+        calculateComponentPositionAndSize(
           point,
           style,
-          curPositon,
+          curPosition,
           proportion,
           needLockProportion,
           {
