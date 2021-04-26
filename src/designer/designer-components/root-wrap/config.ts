@@ -11,7 +11,7 @@ const config: IComponentConfig = {
     backgroundColor: {
       name: '背景色',
       type: 'color',
-      defaultValue: '#ffffff',
+      defaultValue: '#c7c7c7',
     },
   },
 }

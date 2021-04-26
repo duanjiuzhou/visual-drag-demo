@@ -16,7 +16,7 @@ export const defaultRootInstance: IComponentInstance = {
     rotate: 0,
   },
   props: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#c7c7c7',
   },
 }
 
