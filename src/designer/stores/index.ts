@@ -1,28 +1,34 @@
 import { useState, useCallback } from 'react'
 import { createContainer } from 'unstated-next'
-import { IDesignerMode, IComponentInstance, IComponentsMeta } from '../types';
+import { defaultRootInstance } from '../designer-components/root-wrap';
+import { IDesignerMode, IComponentInstance, IComponentsMeta, IDesignerProps } from '../types';
 import { uuid } from '../utils';
 
-interface IDesignerProps {
-    mode: IDesignerMode;
-    componentsMeta: IComponentsMeta
-}
 const initialState: IDesignerProps = {
     mode: "show",
-    componentsMeta: {}
+    componentsMeta: {},
+    componentsInstance: []
 }
+
+// 补充根节点
+const initInstances = (instances: IComponentInstance[]) => {
+    if (instances.length === 0 || instances[0].type !== "root") {
+        instances.unshift(defaultRootInstance);
+    }
+    return instances;
+};
 
 function Designer(state = initialState) {
     // designer状态，edit编辑态，show展示态
     const [mode, setMode] = useState<IDesignerMode>(state.mode || "show");
     // 组件实例列表
-    const [componentsInstance, setComponentsInstance] = useState<IComponentInstance[]>([]);
+    const [componentsInstance, setComponentsInstance] = useState<IComponentInstance[]>(initInstances(state.componentsInstance || []));
     // 组件元数据
     const [componentsMeta, setComponentsMeta] = useState<IComponentsMeta>(
         state.componentsMeta || {}
     );
     // 当前激活的组件索引，0为根节点
-    const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>();
+    const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>(0);
     // 组件是否处于点击状态
     const [isClickComponent, setIsClickComponent] = useState(false)
 

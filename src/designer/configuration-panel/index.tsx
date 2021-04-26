@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from 'react'
 
 // rc
-import { Button, Tabs, Radio } from 'antd'
+import { Tabs, Radio } from 'antd'
 import UISchemaPanel from './ui-schema-panel'
 import DataSchemaPanel from './data-schema-panel'
 import { GuiJsonInput as JsonEditor } from './gui-components'
@@ -100,32 +100,17 @@ const SettingPanel = () => {
     return <Wrap />
   }
 
-  // if (activeComponentIndex === 0 && componentsInstance[0]) {
-  //   return (
-  //     <Wrap>
-  //       <div className="header">
-  //         <span>舞台配置</span>
-  //       </div>
-  //       <UISchemaPanel />
-  //     </Wrap>
-  //   )
-  // }
-
   return (
     <Wrap>
       <div className="header">
-        <span>
-          当前选中组件:{activeComponent.name || ''} <br />
-          版本：{activeComponent.version}
-        </span>
+        <div>当前组件：{activeComponent.name || ''}</div>
+        <div>版本：{activeComponent.version}</div>
+      </div>
+      <div>
         <EditModeSwitch
           onUpdateEditMode={onUpdateEditMode}
           editMode={editMode}
         />
-        {/* <Button type="link" size="small" onClick={showGlobalConfig}> */}
-        <Button type="link" size="small">
-          返回舞台配置
-        </Button>
       </div>
       {editMode === 'nocode' ? (
         <Tabs defaultActiveKey="1">

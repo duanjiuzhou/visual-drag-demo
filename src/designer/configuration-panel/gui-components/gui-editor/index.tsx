@@ -14,7 +14,10 @@ interface IProps {
   successCB: (allValues: any) => void
 }
 
-const GuiItem: FC<{ config: IUIControl; name: string }> = ({ config, name }) => {
+const GuiItem: FC<{ config: IUIControl; name: string }> = ({
+  config,
+  name,
+}) => {
   const { name: label, type, props } = config
   const C = registerFormFields(type)
   if (type === 'hidden') {
@@ -33,7 +36,9 @@ const GuiItem: FC<{ config: IUIControl; name: string }> = ({ config, name }) => 
     )
   }
 
-  const valuePropName = ['boolean', 'switch'].includes(type) ? 'checked' : 'value'
+  const valuePropName = ['boolean', 'switch'].includes(type)
+    ? 'checked'
+    : 'value'
 
   return (
     <Form.Item name={name} label={label} valuePropName={valuePropName}>

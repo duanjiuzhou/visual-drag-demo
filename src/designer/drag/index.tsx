@@ -255,7 +255,7 @@ function Drag(props: DragProps) {
         }
 
         setBoxStyle({ width: style.width, height: style.height })
-        onDrag && onDrag(style, 'point')
+        onDrag && onDrag({ ...style }, 'point')
       }
 
       const up = () => {
@@ -309,7 +309,7 @@ function Drag(props: DragProps) {
           const shapeElStyle = shapeEl.current.style
           shapeElStyle.transform = `rotate(${pos.rotate}deg)`
         }
-        onDrag && onDrag(pos, 'rotate')
+        onDrag && onDrag({ ...pos }, 'rotate')
       }
 
       const up = () => {
@@ -355,7 +355,8 @@ function Drag(props: DragProps) {
         // 后面两个参数代表鼠标移动方向
         // curY - startY > 0 true 表示向下移动 false 表示向上移动
         // curX - startX > 0 true 表示向右移动 false 表示向左移动
-        onDrag && onDrag(pos, 'shape', curY - startY > 0, curX - startX > 0)
+        onDrag &&
+          onDrag({ ...pos }, 'shape', curY - startY > 0, curX - startX > 0)
       }
 
       const up = () => {

@@ -57,7 +57,11 @@ interface IMarkLineProps {
    * @description 获取组件偏移
    * @default
    */
-  getShapeOffset?: (key: 'left' | 'top', value: number) => void
+  getShapeOffset?: (
+    key: 'left' | 'top',
+    value: number,
+    box: IShapeStyleType
+  ) => void
 }
 
 const defaultLineStatus = {
@@ -159,8 +163,8 @@ const MarkLine = (props: IMarkLineProps) => {
 
   const showLine = useCallback(() => {
     const curComponentStyle = getComponentRotatedStyle(_curComponentStyle)
-    const curComponentHalfWidth = curComponentStyle.width / 2
-    const curComponentHalfHeight = curComponentStyle.height / 2
+    const curComponentHalfWidth = Math.round(curComponentStyle.width / 2)
+    const curComponentHalfHeight = Math.round(curComponentStyle.height / 2)
 
     hideLine()
     allComponentStyleList.forEach((component, index) => {
@@ -169,8 +173,8 @@ const MarkLine = (props: IMarkLineProps) => {
       }
       const componentStyle = getComponentRotatedStyle(component)
       const { top, left, bottom, right } = componentStyle
-      const componentHalfWidth = componentStyle.width / 2
-      const componentHalfHeight = componentStyle.height / 2
+      const componentHalfWidth = Math.round(componentStyle.width / 2)
+      const componentHalfHeight = Math.round(componentStyle.height / 2)
 
       const conditions = {
         top: [
@@ -275,7 +279,8 @@ const MarkLine = (props: IMarkLineProps) => {
                 ? translateCurComponentShift(key, condition, curComponentStyle)
                 : condition.dragShift
             // 修改当前组件位移
-            getShapeOffset && getShapeOffset(key as any, value)
+            getShapeOffset &&
+              getShapeOffset(key as any, value, _curComponentStyle)
 
             condition.lineNode.style[key] = `${condition.lineShift}px`
             needToShow.push(condition.line)

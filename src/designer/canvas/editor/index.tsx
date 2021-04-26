@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useState } from 'react'
+import { Suspense, useCallback, useState, useMemo, useRef } from 'react'
 
 // rc
 import Drag, { IShapeStyleType } from '../../drag'
@@ -27,7 +27,14 @@ const Editor = () => {
     isDownward: boolean
     isRightward: boolean
     isShow: boolean
+    id: string
   }>({} as any)
+  const [shapeOffsetInfo, setShapeOffsetInfo] = useState<{
+    curComponentStyle: IShapeStyleType
+    id: string
+  }>()
+
+  const idRef = useRef<string>()
 
   const onDragStart = useCallback(
     (index: number) => {
@@ -43,11 +50,13 @@ const Editor = () => {
     (box: IComponentInstance['box'], id: string) => {
       console.log('onDragEnd')
       updateComponent(id, { box })
+      setShapeOffsetInfo(undefined)
       setMarkLinkState({
         curComponentStyle: box,
         isDownward: false,
         isRightward: false,
         isShow: false,
+        id,
       })
     },
     [updateComponent]
@@ -55,33 +64,62 @@ const Editor = () => {
 
   const onDrag = useCallback(
     (
+      id: string,
       shapeStyle: IShapeStyleType,
       type: 'point' | 'rotate' | 'shape',
       isDownward?: boolean,
       isRightward?: boolean
     ) => {
+      idRef.current = id
       if (type === 'shape') {
-        // console.log(shapeStyle, type, isDownward, isRightward)
         setMarkLinkState({
           curComponentStyle: shapeStyle,
           isDownward: isDownward!,
           isRightward: isRightward!,
           isShow: true,
+          id,
         })
       }
     },
     []
   )
 
-  const getShapeOffset = useCallback((key: 'left' | 'top', value: number) => {
-    console.log(key, value)
-  }, [])
+  const getShapeOffset = useCallback(
+    (key: 'left' | 'top', value: number, box: IShapeStyleType) => {
+      if (idRef.current === undefined) {
+        return
+      }
+      console.log(key, value)
+      const offset = key === 'left' ? { left: value } : { top: value }
+
+      setShapeOffsetInfo({
+        curComponentStyle: { ...box, ...offset },
+        id: idRef.current!,
+      })
+      // setMarkLinkState((_) => {
+      //   const curComponentStyle = { ...box, ...offset }
+      //   return { ..._, curComponentStyle }
+      // })
+    },
+    []
+  )
+
+  const allComponentStyleList = useMemo(
+    () => componentsInstance.map((item) => item.box),
+    [componentsInstance]
+  )
 
   return (
     <div className="editor-wrap grid-wrap" id="canvas-editor">
       {componentsInstance.map((item, index) => {
         const { type, props, box, id } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
+
+        // 根节点直接渲染，仅融合参数
+        if (type === 'root') {
+          return <C key={id} {...props} width={box.width} height={box.height} />
+        }
+
         const activeId =
           activeComponentIndex !== undefined
             ? componentsInstance[activeComponentIndex].id
@@ -91,11 +129,18 @@ const Editor = () => {
             container={'#canvas-editor'}
             key={id}
             isActive={id === activeId}
-            shapeStyle={box}
+            // shapeStyle={box}
+            shapeStyle={
+              shapeOffsetInfo && id === shapeOffsetInfo.id
+                ? shapeOffsetInfo.curComponentStyle
+                : box
+            }
             onDragStart={() => {
               onDragStart(index)
             }}
-            onDrag={onDrag}
+            onDrag={(shapeStyle, _type, isDownward, isRightward) => {
+              onDrag(id, shapeStyle, _type, isDownward, isRightward)
+            }}
             onDragEnd={(dragBox) => {
               onDragEnd(dragBox, id)
             }}
@@ -104,16 +149,17 @@ const Editor = () => {
               <div
                 style={{ pointerEvents: 'none', width: '100%', height: '100%' }}
               >
-                <C {...props} />
+                <C {...props} width={box.width} height={box.height} />
               </div>
             </Suspense>
           </Drag>
         )
       })}
       <MarkLine
+        diff={3}
         getShapeOffset={getShapeOffset}
         activeComponentIndex={activeComponentIndex!}
-        allComponentStyleList={componentsInstance.map((item) => item.box)}
+        allComponentStyleList={allComponentStyleList}
         {...markLinkState}
       />
     </div>

@@ -30,18 +30,18 @@ const Canvas = () => {
       if (!key) {
         return
       }
-      const { uiSchema, showName } = componentsMeta[key]
+      const { uiSchema, showName, version = '0.1.0' } = componentsMeta[key]
       const defaultValue = getDefaultValue(uiSchema)
       const [width, height] = [
-        defaultValue.width || 300,
-        defaultValue.height || 300,
+        defaultValue.width || 150,
+        defaultValue.height || 150,
       ]
 
       addComponent({
         id: '',
         type: key,
         name: showName,
-        version: '0.1',
+        version,
         box: {
           width,
           height,
@@ -63,7 +63,7 @@ const Canvas = () => {
 
   const handleMouseUp = useCallback(() => {
     if (!isClickComponent) {
-      setActiveComponentIndex(undefined)
+      setActiveComponentIndex(0)
     }
   }, [isClickComponent, setActiveComponentIndex])
 

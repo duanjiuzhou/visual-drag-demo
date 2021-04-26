@@ -2,7 +2,7 @@ import { IDataSchema, IUISchema } from "../configuration-panel/gui-components/ty
 
 export type IDesignerMode = "show" | "edit";
 
-// 组件配置，包含可配置项和默认值
+// 组件配置，包含可配置项和默认值 
 export interface IComponentConfig {
     version: string; // 版本号
     classify?: string[]; // 分类，支持多个，未填作为暂时隐藏组件
