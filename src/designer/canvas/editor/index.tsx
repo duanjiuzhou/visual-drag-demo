@@ -2,7 +2,8 @@ import { Suspense, useCallback, useState, useMemo, useRef } from 'react'
 
 // rc
 import Drag, { IShapeStyleType } from '../../drag'
-import MarkLine from '../../markLine'
+import MarkLine from '../../mark-line'
+import ContextMenu from '@src/designer/context-menu'
 
 // stores
 import { useDesigner } from '../../stores'
@@ -21,6 +22,7 @@ const Editor = () => {
     updateComponent,
     setIsClickComponent,
     setActiveComponentIndex,
+    showContextMenu,
   } = useDesigner()
   const [markLinkState, setMarkLinkState] = useState<{
     curComponentStyle: IShapeStyleType
@@ -39,7 +41,6 @@ const Editor = () => {
   const onDragStart = useCallback(
     (index: number) => {
       console.log('onDragStart')
-
       setIsClickComponent(true)
       setActiveComponentIndex(index)
     },
@@ -84,6 +85,30 @@ const Editor = () => {
     []
   )
 
+  const onContextMenu = useCallback(
+    (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+      console.log('onContextMenu')
+
+      // 计算菜单相对于编辑器的位移
+      let target = e.target
+      let top = e.nativeEvent.offsetY
+      let left = e.nativeEvent.offsetX
+      while (target instanceof SVGElement) {
+        target = target.parentNode
+      }
+
+      while (!target.className.includes('editor-wrap')) {
+        left += target.offsetLeft
+        top += target.offsetTop
+        target = target.parentNode
+      }
+      showContextMenu(top, left)
+    },
+    [showContextMenu]
+  )
+
   const getShapeOffset = useCallback(
     (key: 'left' | 'top', value: number, box: IShapeStyleType) => {
       if (idRef.current === undefined) {
@@ -110,7 +135,11 @@ const Editor = () => {
   )
 
   return (
-    <div className="editor-wrap grid-wrap" id="canvas-editor">
+    <div
+      className="editor-wrap grid-wrap"
+      id="canvas-editor"
+      onContextMenu={onContextMenu}
+    >
       {componentsInstance.map((item, index) => {
         const { type, props, box, id } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
@@ -124,6 +153,7 @@ const Editor = () => {
           activeComponentIndex !== undefined
             ? componentsInstance[activeComponentIndex].id
             : ''
+
         return (
           <Drag
             container={'#canvas-editor'}
@@ -155,6 +185,7 @@ const Editor = () => {
           </Drag>
         )
       })}
+      <ContextMenu />
       <MarkLine
         diff={3}
         getShapeOffset={getShapeOffset}

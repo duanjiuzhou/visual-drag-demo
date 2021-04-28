@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { createContainer } from 'unstated-next'
 import { defaultRootInstance } from '../designer-components/root-wrap';
 import { IDesignerMode, IComponentInstance, IComponentsMeta, IDesignerProps } from '../types';
@@ -31,6 +31,12 @@ function Designer(state = initialState) {
     const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>(0);
     // 组件是否处于点击状态
     const [isClickComponent, setIsClickComponent] = useState(false)
+    // 右击菜单数据
+    const [contextMenuState, setContextMenuState] = useState({
+        top: 0,
+        left: 0,
+        show: false,
+    })
 
     // 添加组件
     const addComponent = useCallback((componentInstance: IComponentInstance) => {
@@ -56,12 +62,34 @@ function Designer(state = initialState) {
         });
     }, []);
 
+    const activeComponent = useMemo(
+        () =>
+            activeComponentIndex !== undefined
+                ? componentsInstance[activeComponentIndex]
+                : undefined,
+        [activeComponentIndex, componentsInstance]
+    )
+
+    // 显示右键菜单
+    const showContextMenu = useCallback((top: number, left: number) => {
+        setContextMenuState({ show: true, left, top })
+    }, [])
+
+    // 隐藏右键菜单
+    const hideContextMenu = useCallback(() => {
+        setContextMenuState((_) => ({
+            ..._, show: false
+        }))
+    }, [])
+
     return {
         mode, setMode, componentsInstance,
         updateComponent, addComponent,
         componentsMeta, setComponentsMeta,
         activeComponentIndex, setActiveComponentIndex,
         isClickComponent, setIsClickComponent,
+        contextMenuState, hideContextMenu, showContextMenu,
+        activeComponent,
     }
 }
 

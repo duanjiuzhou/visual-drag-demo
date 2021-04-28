@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { GuiEditor } from '../gui-components'
 import BaseSchema from './base-schema'
 import { unFlatten, flatten, getDefaultValue } from '../../utils'
-import { IComponentInstance } from '@src/designer/types'
 
 const Wrap = styled.div`
   font-size: 20px;
@@ -13,22 +12,8 @@ const Wrap = styled.div`
 `
 
 const UISchemaPanel = () => {
-  const {
-    activeComponentIndex,
-    componentsInstance,
-    componentsMeta,
-    updateComponent,
-  } = useDesigner()
-
-  const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
-  )
-
-  const { id, box, props, type } = activeComponent
+  const { activeComponent, componentsMeta, updateComponent } = useDesigner()
+  const { box, props, type } = activeComponent || {}
 
   const { config, defaultValue } = useMemo(() => {
     const _config = {
@@ -64,10 +49,12 @@ const UISchemaPanel = () => {
             zIndex,
             ..._props
           } = allValues
-          updateComponent(id, {
-            box: { ...box, width, height, top, left, rotate, zIndex },
-            props: { ...props, ...unFlatten(_props) },
-          })
+
+          activeComponent &&
+            updateComponent(activeComponent.id, {
+              box: { ...box, width, height, top, left, rotate, zIndex },
+              props: { ...props, ...unFlatten(_props) },
+            })
         }}
       />
     </Wrap>

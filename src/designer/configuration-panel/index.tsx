@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState } from 'react'
 
 // rc
 import { Tabs, Radio } from 'antd'
@@ -35,24 +35,13 @@ const Wrap = styled.div`
 `
 
 const ProCodePanel = () => {
-  const {
-    activeComponentIndex,
-    componentsInstance,
-    updateComponent,
-  } = useDesigner()
-
-  const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
-  )
+  const { updateComponent, activeComponent } = useDesigner()
 
   return (
     <JsonEditor
-      value={activeComponent}
+      value={activeComponent || {}}
       onSave={(value) =>
+        activeComponent &&
         updateComponent(activeComponent.id, value as IComponentInstance)
       }
     />
@@ -80,21 +69,13 @@ const EditModeSwitch = (props: {
 }
 
 const SettingPanel = () => {
-  const { activeComponentIndex, componentsInstance } = useDesigner()
+  const { componentsInstance, activeComponent } = useDesigner()
 
   const [editMode, setEditMode] = useState<IEditMode>('nocode') // 编辑态模式，
 
   const onUpdateEditMode = useCallback((_editMode: IEditMode) => {
     setEditMode(_editMode)
   }, [])
-
-  const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
-  )
 
   if (componentsInstance.length === 0) {
     return <Wrap />
@@ -103,8 +84,8 @@ const SettingPanel = () => {
   return (
     <Wrap>
       <div className="header">
-        <div>当前组件：{activeComponent.name || ''}</div>
-        <div>版本：{activeComponent.version}</div>
+        <div>当前组件：{activeComponent?.name || '--'}</div>
+        <div>版本：{activeComponent?.version || '--'}</div>
       </div>
       <div>
         <EditModeSwitch

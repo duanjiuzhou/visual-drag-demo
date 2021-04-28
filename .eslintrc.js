@@ -50,6 +50,7 @@ module.exports = {
     '@typescript-eslint/dot-notation': 'off',
     '@typescript-eslint/no-unused-expressions': 'off',
     '@typescript-eslint/consistent-type-imports': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
     'arrow-body-style': 'off',
     'arrow-parens': ['off', 'as-needed'],
     complexity: 'off',

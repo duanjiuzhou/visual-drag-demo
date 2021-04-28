@@ -1,9 +1,8 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useCallback } from 'react'
 import { useDesigner } from '../../stores'
 import styled from 'styled-components'
 import { GuiEditor } from '../gui-components'
 import { IDataSchema } from '../gui-components/types'
-import { IComponentInstance } from '@src/designer/types'
 
 const Wrap = styled.div`
   font-size: 20px;
@@ -30,43 +29,28 @@ const DataConfig: IDataSchema = {
 }
 
 const defaultValue: Record<string, any> = {}
+
 for (const param in DataConfig) {
   defaultValue[param] = DataConfig[param].defaultValue
 }
 
 const DataSchemaPanel = () => {
-  const {
-    activeComponentIndex,
-    componentsInstance,
-    updateComponent,
-  } = useDesigner()
-
-  const activeComponent = useMemo(
-    () =>
-      activeComponentIndex !== undefined
-        ? componentsInstance[activeComponentIndex]
-        : ({} as IComponentInstance),
-    [activeComponentIndex, componentsInstance]
-  )
-
-  const { id } = activeComponent
-  const [dataSource, setDataSource] = useState(activeComponent.dataSource)
+  const { activeComponent, updateComponent } = useDesigner()
 
   const onFinish = useCallback(
     (allValues) => {
-      updateComponent(id, { dataSource: { ...dataSource, ...allValues } })
+      activeComponent &&
+        updateComponent(activeComponent.id, {
+          dataSource: { ...activeComponent.dataSource, ...allValues },
+        })
     },
-    [dataSource, id, updateComponent]
+    [activeComponent, updateComponent]
   )
 
-  useEffect(() => {
-    setDataSource(activeComponent.dataSource)
-  }, [activeComponent])
-
   return (
-    <Wrap key={id}>
+    <Wrap>
       <GuiEditor
-        value={activeComponent.dataSource || defaultValue}
+        value={activeComponent?.dataSource || defaultValue}
         config={DataConfig}
         successCB={onFinish}
       />

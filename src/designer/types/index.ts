@@ -35,6 +35,7 @@ export interface IComponentInstance<T = any> {
     type: string; // 组件名称
     name: string; // 组件类型
     version: string; // 用于后续版本订正
+    isLock?: boolean; // 是否锁定
     box: {
         // 必填 box
         width: number;
