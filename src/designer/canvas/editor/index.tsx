@@ -23,6 +23,7 @@ const Editor = () => {
     setIsClickComponent,
     setActiveComponentIndex,
     showContextMenu,
+    hideContextMenu,
   } = useDesigner()
   const [markLinkState, setMarkLinkState] = useState<{
     curComponentStyle: IShapeStyleType
@@ -173,6 +174,9 @@ const Editor = () => {
             }}
             onDragEnd={(dragBox) => {
               onDragEnd(dragBox, id)
+            }}
+            onCLick={() => {
+              hideContextMenu()
             }}
           >
             <Suspense fallback={suspenseFallback}>

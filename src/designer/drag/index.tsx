@@ -88,6 +88,11 @@ export interface DragProps {
    * @default
    */
   onDragEnd?: (shapeStyle: IShapeStyleType) => void
+  /**
+   * @description 容器点击事件
+   * @default
+   */
+  onCLick?: () => void
 }
 
 function Drag(props: DragProps) {
@@ -99,6 +104,7 @@ function Drag(props: DragProps) {
     onDrag,
     onDragStart,
     onDragEnd,
+    onCLick,
   } = props
   const [boxStyle, setBoxStyle] = useState({
     width: shapeStyle.width,
@@ -371,6 +377,16 @@ function Drag(props: DragProps) {
     [shapeStyle, onDrag, onDragEnd, onDragStart]
   )
 
+  const handleClick = useCallback(
+    (e) => {
+      // 阻止向父组件冒泡
+      e.stopPropagation()
+      e.preventDefault()
+      onCLick && onCLick()
+    },
+    [onCLick]
+  )
+
   useEffect(() => {
     setBoxStyle({ width: shapeStyle.width, height: shapeStyle.height })
   }, [shapeStyle.height, shapeStyle.width])
@@ -385,6 +401,7 @@ function Drag(props: DragProps) {
     <div
       className="drag-shape-wrap"
       onMouseDown={handleMouseDownOnShape}
+      onClick={handleClick}
       ref={shapeEl}
       style={{
         top: shapeStyle.top,

@@ -59,13 +59,15 @@ const Canvas = () => {
   )
 
   const handleMouseDown = useCallback(() => {
+    console.log('关闭当前组件激活态')
     setIsClickComponent(false)
   }, [setIsClickComponent])
 
   const handleMouseUp = useCallback(() => {
     console.log('触发鼠标弹起')
-    hideContextMenu()
+
     if (!isClickComponent) {
+      hideContextMenu()
       setActiveComponentIndex(0)
     }
   }, [hideContextMenu, isClickComponent, setActiveComponentIndex])
