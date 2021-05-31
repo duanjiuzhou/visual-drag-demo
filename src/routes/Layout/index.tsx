@@ -1,6 +1,11 @@
 // rc
 import Header from './header'
-import { ComponentList, Designer, ConfigurationPanel, Canvas } from '@src/designer'
+import {
+  ComponentList,
+  Designer,
+  ConfigurationPanel,
+  Canvas,
+} from '@src/designer'
 
 import componentsMeta from '@src/designer/components-meta'
 
@@ -15,7 +20,7 @@ const Layout = () => {
         <div className="layout-content">
           <ComponentList />
           <div className="canvas-wrap">
-            <Canvas />
+            <Canvas className="canvas-content" />
           </div>
 
           <ConfigurationPanel />

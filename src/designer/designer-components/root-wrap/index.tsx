@@ -8,8 +8,8 @@ export const defaultRootInstance: IComponentInstance = {
   name: '舞台',
   version: '0.1.0',
   box: {
-    width: 1920,
-    height: 1080,
+    width: 1200,
+    height: 740,
     left: 0,
     top: 0,
     zIndex: 1,

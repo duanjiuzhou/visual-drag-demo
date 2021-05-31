@@ -9,7 +9,12 @@ import { useDesigner } from '../stores'
 // utils
 import { getDefaultValue, unFlatten } from '../utils'
 
-const Canvas = () => {
+interface IProps {
+  className?: string
+}
+
+const Canvas = (props: IProps) => {
+  const { className = '' } = props
   const {
     addComponent,
     componentsMeta,
@@ -78,6 +83,7 @@ const Canvas = () => {
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onDrop={handleDrop}
+      className={className}
     >
       <Editor />
     </div>
