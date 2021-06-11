@@ -109,7 +109,7 @@ const Editor = () => {
     [showContextMenu]
   )
 
-  const onRootMouseDown = useCallback((e: any, index: number) => {
+  const onRootMouseDown = useCallback((index: number, e: any) => {
     e.stopPropagation()
     setIsClickComponent(true)
     setActiveComponentIndex(index)
