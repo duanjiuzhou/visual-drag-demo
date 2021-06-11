@@ -21,7 +21,6 @@ const Canvas = (props: IProps) => {
     isClickComponent,
     setIsClickComponent,
     hideContextMenu,
-    setActiveComponentIndex,
   } = useDesigner()
   const handleDragOver = useCallback((e) => {
     e.preventDefault()
@@ -70,12 +69,10 @@ const Canvas = (props: IProps) => {
 
   const handleMouseUp = useCallback(() => {
     console.log('触发鼠标弹起')
-
     if (!isClickComponent) {
       hideContextMenu()
-      setActiveComponentIndex(0)
     }
-  }, [hideContextMenu, isClickComponent, setActiveComponentIndex])
+  }, [hideContextMenu, isClickComponent])
 
   return (
     <div

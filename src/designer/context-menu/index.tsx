@@ -16,6 +16,7 @@ const ContextMenu = () => {
 
   const handleMouseUp = useCallback(() => {
     setIsClickComponent(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const copy = useCallback(() => {}, [])

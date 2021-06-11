@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, memo } from 'react'
 
 // utils
 import { getComponentRotatedStyle } from './utils/style'
@@ -73,7 +73,7 @@ const defaultLineStatus = {
   yr: false,
 }
 
-const MarkLine = (props: IMarkLineProps) => {
+const MarkLine = memo((props: IMarkLineProps) => {
   const {
     diff = 3,
     isShow,
@@ -322,6 +322,6 @@ const MarkLine = (props: IMarkLineProps) => {
       ))}
     </div>
   )
-}
+})
 
 export default MarkLine

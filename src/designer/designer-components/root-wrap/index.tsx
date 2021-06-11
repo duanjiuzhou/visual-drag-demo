@@ -25,6 +25,8 @@ interface IProps {
   height: number
   backgroundColor: string
   children?: React.ReactNode
+  onClick?: () => void
+  onMouseDown?: () => void
 }
 
 const Wrap = styled.div<IProps>`

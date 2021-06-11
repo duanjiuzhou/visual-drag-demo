@@ -22,7 +22,6 @@ const Layout = () => {
           <div className="canvas-wrap">
             <Canvas className="canvas-content" />
           </div>
-
           <ConfigurationPanel />
         </div>
       </Designer>

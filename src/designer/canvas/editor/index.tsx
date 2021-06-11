@@ -30,13 +30,13 @@ const Editor = () => {
     isDownward: boolean
     isRightward: boolean
     isShow: boolean
-    id: string
   }>({} as any)
   const [shapeOffsetInfo, setShapeOffsetInfo] = useState<{
     curComponentStyle: IShapeStyleType
     id: string
   }>()
 
+  const shapeOffsetInfoRef = useRef(shapeOffsetInfo)
   const idRef = useRef<string>()
 
   const onDragStart = useCallback(
@@ -53,12 +53,12 @@ const Editor = () => {
       console.log('onDragEnd')
       updateComponent(id, { box })
       setShapeOffsetInfo(undefined)
+      shapeOffsetInfoRef.current = undefined
       setMarkLinkState({
         curComponentStyle: box,
         isDownward: false,
         isRightward: false,
         isShow: false,
-        id,
       })
     },
     [updateComponent]
@@ -79,7 +79,6 @@ const Editor = () => {
           isDownward: isDownward!,
           isRightward: isRightward!,
           isShow: true,
-          id,
         })
       }
     },
@@ -110,22 +109,34 @@ const Editor = () => {
     [showContextMenu]
   )
 
+  const onRootMouseDown = useCallback((e: any, index: number) => {
+    e.stopPropagation()
+    setIsClickComponent(true)
+    setActiveComponentIndex(index)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const getShapeOffset = useCallback(
     (key: 'left' | 'top', value: number, box: IShapeStyleType) => {
       if (idRef.current === undefined) {
         return
       }
-      console.log(key, value)
-      const offset = key === 'left' ? { left: value } : { top: value }
 
-      setShapeOffsetInfo({
+      // 数据一致不更新
+      if (
+        shapeOffsetInfoRef.current &&
+        shapeOffsetInfoRef.current.curComponentStyle[key] === value
+      ) {
+        return
+      }
+
+      const offset = { [key]: value }
+      const result = {
         curComponentStyle: { ...box, ...offset },
         id: idRef.current!,
-      })
-      // setMarkLinkState((_) => {
-      //   const curComponentStyle = { ...box, ...offset }
-      //   return { ..._, curComponentStyle }
-      // })
+      }
+      shapeOffsetInfoRef.current = result
+      setShapeOffsetInfo(result)
     },
     []
   )
@@ -144,10 +155,17 @@ const Editor = () => {
       {componentsInstance.map((item, index) => {
         const { type, props, box, id } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
-
         // 根节点直接渲染，仅融合参数
         if (type === 'root') {
-          return <C key={id} {...props} width={box.width} height={box.height} />
+          return (
+            <C
+              key={id}
+              {...props}
+              width={box.width}
+              height={box.height}
+              onMouseDown={onRootMouseDown.bind(null, index)}
+            />
+          )
         }
 
         const activeId =
@@ -195,7 +213,10 @@ const Editor = () => {
         getShapeOffset={getShapeOffset}
         activeComponentIndex={activeComponentIndex!}
         allComponentStyleList={allComponentStyleList}
-        {...markLinkState}
+        curComponentStyle={markLinkState.curComponentStyle}
+        isDownward={markLinkState.isDownward}
+        isRightward={markLinkState.isRightward}
+        isShow={markLinkState.isShow}
       />
     </div>
   )
