@@ -59,6 +59,11 @@ export interface DragProps {
    */
   isStatic?: boolean
   /**
+   * @description 缩放系数
+   * @default {x: 1, y: 1}
+   */
+  scale?: { x: number; y: number }
+  /**
    * @description 盒子布局样式
    * @default
    */
@@ -101,6 +106,7 @@ function Drag(props: DragProps) {
     shapeStyle,
     isActive,
     container,
+    scale = { x: 1, y: 1 },
     onDrag,
     onDragStart,
     onDragEnd,
@@ -190,6 +196,7 @@ function Drag(props: DragProps) {
       e.preventDefault()
 
       const style = { ...shapeStyle }
+      const { x: scaleX, y: scaleY } = scale
 
       // 组件宽高比
       const proportion = style.width / style.height
@@ -212,8 +219,8 @@ function Drag(props: DragProps) {
 
       // 当前点击坐标
       const curPoint = {
-        x: e.clientX - editorRectInfo.left,
-        y: e.clientY - editorRectInfo.top,
+        x: (e.clientX - editorRectInfo.left) / scaleX,
+        y: (e.clientY - editorRectInfo.top) / scaleY,
       }
 
       // 获取对称点的坐标
@@ -235,8 +242,8 @@ function Drag(props: DragProps) {
         }
 
         const curPosition = {
-          x: moveEvent.clientX - editorRectInfo.left,
-          y: moveEvent.clientY - editorRectInfo.top,
+          x: (moveEvent.clientX - editorRectInfo.left) / scaleX,
+          y: (moveEvent.clientY - editorRectInfo.top) / scaleY,
         }
 
         calculateComponentPositionAndSize(
@@ -275,7 +282,7 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [shapeStyle, container, onDrag, onDragEnd, onDragStart]
+    [onDragStart, shapeStyle, scale, container, onDrag, onDragEnd]
   )
 
   const handleRotate = useCallback(
@@ -348,11 +355,14 @@ function Drag(props: DragProps) {
       const startTop = Number(pos.top)
       const startLeft = Number(pos.left)
 
+      const { x: scaleX, y: scaleY } = scale
+
       const move = (moveEvent: MouseEvent) => {
         const curX = moveEvent.clientX
         const curY = moveEvent.clientY
-        pos.top = curY - startY + startTop
-        pos.left = curX - startX + startLeft
+
+        pos.top = (curY - startY) / scaleY + startTop
+        pos.left = (curX - startX) / scaleX + startLeft
         const style = e.target.style
         style.top = `${pos.top}px`
         style.left = `${pos.left}px`
@@ -374,7 +384,7 @@ function Drag(props: DragProps) {
       document.addEventListener('mousemove', move)
       document.addEventListener('mouseup', up)
     },
-    [shapeStyle, onDrag, onDragEnd, onDragStart]
+    [onDragStart, shapeStyle, scale, onDrag, onDragEnd]
   )
 
   const handleClick = useCallback(

@@ -129,10 +129,12 @@ const Editor = () => {
       ) {
         return
       }
-
       const offset = { [key]: value }
       const result = {
-        curComponentStyle: { ...box, ...offset },
+        curComponentStyle: {
+          ...box,
+          ...offset,
+        },
         id: idRef.current!,
       }
       shapeOffsetInfoRef.current = result
@@ -175,6 +177,7 @@ const Editor = () => {
 
         return (
           <Drag
+            scale={{ x: 0.5, y: 0.5 }}
             container={'#canvas-editor'}
             key={id}
             isActive={id === activeId}
