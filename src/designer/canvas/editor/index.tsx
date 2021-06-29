@@ -155,7 +155,7 @@ const Editor = () => {
       onContextMenu={onContextMenu}
     >
       {componentsInstance.map((item, index) => {
-        const { type, props, box, id } = item
+        const { type, props, box, id, dataSource } = item
         const { component: C, suspenseFallback = null } = componentsMeta[type]
         // 根节点直接渲染，仅融合参数
         if (type === 'root') {
@@ -166,6 +166,7 @@ const Editor = () => {
               width={box.width}
               height={box.height}
               onMouseDown={onRootMouseDown.bind(null, index)}
+              data={dataSource?.staticData}
             />
           )
         }
@@ -204,7 +205,12 @@ const Editor = () => {
               <div
                 style={{ pointerEvents: 'none', width: '100%', height: '100%' }}
               >
-                <C {...props} width={box.width} height={box.height} />
+                <C
+                  {...props}
+                  width={box.width}
+                  height={box.height}
+                  data={dataSource?.staticData}
+                />
               </div>
             </Suspense>
           </Drag>

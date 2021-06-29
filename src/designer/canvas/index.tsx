@@ -35,8 +35,14 @@ const Canvas = (props: IProps) => {
       if (!key) {
         return
       }
-      const { uiSchema, showName, version = '0.1.0' } = componentsMeta[key]
+      const {
+        uiSchema,
+        showName,
+        version = '0.1.0',
+        dataSchema,
+      } = componentsMeta[key]
       const defaultValue = getDefaultValue(uiSchema)
+
       const [width, height] = [
         defaultValue.width || 150,
         defaultValue.height || 150,
@@ -56,7 +62,7 @@ const Canvas = (props: IProps) => {
           rotate: 0,
         }, // 定位参数
         props: { ...unFlatten(defaultValue), width, height },
-        dataSource: componentsMeta[key].dataSchema || {},
+        dataSource: dataSchema || {},
       })
     },
     [addComponent, componentsMeta]

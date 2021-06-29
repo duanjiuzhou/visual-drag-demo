@@ -1,5 +1,4 @@
-import { Radio } from 'antd'
-import { RadioGroupProps } from 'antd/lib/radio'
+import { Radio, RadioGroupProps } from 'antd'
 
 export default function RadioControl(props: RadioGroupProps) {
   return (

@@ -1,5 +1,4 @@
-import { Checkbox } from 'antd'
-import { CheckboxProps } from 'antd/lib/checkbox'
+import { Checkbox, CheckboxProps } from 'antd'
 
 export default function BooleanControl(props: CheckboxProps) {
   return <Checkbox {...props} />

@@ -1,5 +1,4 @@
-import { Switch } from 'antd'
-import { SwitchProps } from 'antd/lib/switch'
+import { Switch, SwitchProps } from 'antd'
 
 // SliderRangeProps
 export default function SwitchControl(props: SwitchProps) {

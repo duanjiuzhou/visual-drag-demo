@@ -1,4 +1,4 @@
-import { IDataSchema, IUISchema } from "../configuration-panel/gui-components/types";
+import { IUISchema } from "../configuration-panel/gui-components/types";
 
 export type IDesignerMode = "show" | "edit";
 
@@ -12,7 +12,8 @@ export interface IComponentConfig {
     icon?: string; // 组件icon
     image?: string; // 组件示意图
     uiSchema: IUISchema;
-    dataSchema?: IDataSchema;
+    // dataSchema?: IDataSchema;
+    dataSchema?: any;
 }
 
 // 元组件定义

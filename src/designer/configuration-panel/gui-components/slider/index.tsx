@@ -1,5 +1,4 @@
-import { Slider } from 'antd'
-import { SliderSingleProps } from 'antd/lib/slider'
+import { Slider, SliderSingleProps } from 'antd'
 
 // SliderRangeProps
 export default function SliderControl(

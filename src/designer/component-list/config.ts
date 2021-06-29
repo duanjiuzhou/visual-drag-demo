@@ -18,6 +18,9 @@ const componentListConfig: IComponentListItem[] = [
     {
         key: "image",
     },
+    {
+        key: "pie-chart",
+    },
 ];
 
 export default componentListConfig;
