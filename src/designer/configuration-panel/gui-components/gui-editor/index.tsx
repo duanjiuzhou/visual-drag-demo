@@ -4,8 +4,8 @@ import { registerFormFields } from './register'
 import { IUIControl, IGroupControl } from '../types'
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+  labelCol: { span: 7 },
+  wrapperCol: { span: 19 },
 }
 
 interface IProps {
@@ -41,7 +41,12 @@ const GuiItem: FC<{ config: IUIControl; name: string }> = ({
     : 'value'
 
   return (
-    <Form.Item name={name} label={label} valuePropName={valuePropName}>
+    <Form.Item
+      name={name}
+      label={label}
+      labelAlign={'left'}
+      valuePropName={valuePropName}
+    >
       <C {...props} />
     </Form.Item>
   )

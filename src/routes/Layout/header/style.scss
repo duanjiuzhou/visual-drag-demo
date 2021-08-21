@@ -1,9 +1,32 @@
-.header-wrap {
+.wrap {
   display: flex;
   align-items: center;
-  height: 64px;
+  justify-content: space-between;
+  height: 40px;
   padding: 10px;
-  line-height: 64px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  color: #fff;
+  line-height: 40px;
+  background: #2e3138;
+  .component-warp {
+    display: flex;
+  }
+  .icon {
+    font-size: 18px;
+  }
+  .handle-wrap {
+    display: block;
+  }
+  .release-wrap {
+    color: #187ddc;
+    transition: all 0.3s;
+    &:active {
+      color: #388ed3;
+    }
+    &:hover {
+      color: #165996;
+    }
+    .release {
+      transform: rotate(316deg);
+    }
+  }
 }

@@ -57,10 +57,10 @@ const JsonEditor = (props: IProps) => {
   return (
     <Wrap>
       <Editor
-        height={props.height || 600}
+        height={props.height || 500}
         width={props.width || '100%'}
         language="json"
-        theme="dark"
+        theme="vs-dark"
         value={editorValue}
         // options={{
         //   formatOnType: true,
@@ -71,7 +71,12 @@ const JsonEditor = (props: IProps) => {
 
       {/* 传参保存方法既显示 */}
       {props.onSave && (
-        <Button className="btn-save" type="primary" onClick={handleSave} disabled={!isEditorReady}>
+        <Button
+          className="btn-save"
+          type="primary"
+          onClick={handleSave}
+          disabled={!isEditorReady}
+        >
           更新
         </Button>
       )}

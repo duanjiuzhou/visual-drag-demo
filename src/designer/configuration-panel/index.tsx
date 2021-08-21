@@ -1,7 +1,5 @@
-import { useCallback, useState } from 'react'
-
 // rc
-import { Tabs, Radio } from 'antd'
+import { Tabs } from 'antd'
 import UISchemaPanel from './ui-schema-panel'
 import DataSchemaPanel from './data-schema-panel'
 import { GuiJsonInput as JsonEditor } from './gui-components'
@@ -17,20 +15,20 @@ import styled from 'styled-components'
 
 const { TabPane } = Tabs
 
-type IEditMode = 'nocode' | 'procode'
-
 const Wrap = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 262px; // 360px;
+  min-width: 340px;
   height: 100%;
   padding: 10px;
-  background: #1d1f23;
+  background: #25282e;
   color: #fff;
   .header {
-    display: flex;
-    justify-content: space-between;
+    .name {
+      margin-right: 10px;
+      font-size: 12px;
+    }
+    .version {
+      color: #7d7c7c;
+    }
   }
 `
 
@@ -48,63 +46,47 @@ const ProCodePanel = () => {
   )
 }
 
-const EditModeSwitch = (props: {
-  onUpdateEditMode: (_editMode: IEditMode) => void
-  editMode: IEditMode
-}) => {
-  const { editMode, onUpdateEditMode } = props
-
+const ComponentInfo = () => {
+  const { activeComponent } = useDesigner()
   return (
-    <Radio.Group
-      options={[
-        { label: 'No-Code', value: 'nocode' },
-        { label: 'Pro-Code', value: 'procode' },
-      ]}
-      size="small"
-      optionType="button"
-      onChange={(e) => onUpdateEditMode(e.target.value)}
-      value={editMode}
-    />
+    <div className="header">
+      <span className="name">{activeComponent?.name || '--'}</span>
+      <span className="version">
+        {activeComponent?.version ? `v${activeComponent?.version}` : '--'}
+      </span>
+    </div>
   )
 }
 
-const SettingPanel = () => {
-  const { componentsInstance, activeComponent } = useDesigner()
+interface IProps {
+  className?: string
+  style?: React.CSSProperties
+}
 
-  const [editMode, setEditMode] = useState<IEditMode>('nocode') // 编辑态模式，
-
-  const onUpdateEditMode = useCallback((_editMode: IEditMode) => {
-    setEditMode(_editMode)
-  }, [])
+const SettingPanel = (props: IProps) => {
+  const { className = '', style } = props
+  const { componentsInstance } = useDesigner()
 
   if (componentsInstance.length === 0) {
-    return <Wrap />
+    return <Wrap className={className} style={style} />
   }
 
   return (
-    <Wrap>
-      <div className="header">
-        <div>当前组件：{activeComponent?.name || '--'}</div>
-        <div>版本：{activeComponent?.version || '--'}</div>
-      </div>
-      <div>
-        <EditModeSwitch
-          onUpdateEditMode={onUpdateEditMode}
-          editMode={editMode}
-        />
-      </div>
-      {editMode === 'nocode' ? (
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="样式" key="1">
-            <UISchemaPanel />
-          </TabPane>
-          <TabPane tab="数据" key="2">
-            <DataSchemaPanel />
-          </TabPane>
-        </Tabs>
-      ) : (
-        <ProCodePanel />
-      )}
+    <Wrap className={className} style={style}>
+      <Tabs defaultActiveKey="1" type="card">
+        <TabPane tab="配置" key="1">
+          <ComponentInfo />
+          <UISchemaPanel />
+        </TabPane>
+        <TabPane tab="数据" key="2">
+          <ComponentInfo />
+          <DataSchemaPanel />
+        </TabPane>
+        <TabPane tab="code" key="3">
+          <ComponentInfo />
+          <ProCodePanel />
+        </TabPane>
+      </Tabs>
     </Wrap>
   )
 }

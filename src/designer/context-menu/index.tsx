@@ -9,13 +9,14 @@ import './style.scss'
 const ContextMenu = () => {
   const {
     activeComponent,
+    activeComponentIndex,
     contextMenuState,
-    setIsClickComponent,
+    hideContextMenu,
   } = useDesigner()
   const { show, top, left } = contextMenuState
 
   const handleMouseUp = useCallback(() => {
-    setIsClickComponent(true)
+    hideContextMenu()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -33,26 +34,38 @@ const ContextMenu = () => {
   return show ? (
     <div className="context-menu" style={{ top, left }}>
       <ul onMouseUp={handleMouseUp}>
-        {activeComponent ? (
+        {activeComponentIndex !== 0 ? (
           <>
-            {activeComponent.isLock ? (
+            {activeComponent && !activeComponent.isLock ? (
               <>
-                <li onClick={copy}>复制</li>
-                <li onClick={paste}>粘贴</li>
-                <li onClick={cut}>剪切</li>
+                <li onClick={copy} className="disabled">
+                  复制
+                </li>
+                <li onClick={paste} className="disabled">
+                  粘贴
+                </li>
+                <li onClick={cut} className="disabled">
+                  剪切
+                </li>
                 <li onClick={deleteComponent}>删除</li>
-                <li onClick={lock}>锁定</li>
+                <li onClick={lock} className="disabled">
+                  锁定
+                </li>
                 <li onClick={topComponent}>置顶</li>
                 <li onClick={bottomComponent}>置底</li>
                 <li onClick={upComponent}>上移</li>
                 <li onClick={downComponent}>下移</li>
               </>
             ) : (
-              <li onClick={unlock}>解锁</li>
+              <li onClick={unlock} className="disabled">
+                解锁
+              </li>
             )}
           </>
         ) : (
-          <li onClick={paste}>粘贴</li>
+          <li onClick={paste} className="disabled">
+            粘贴
+          </li>
         )}
       </ul>
     </div>

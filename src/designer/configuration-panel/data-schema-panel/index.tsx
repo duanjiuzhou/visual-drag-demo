@@ -6,7 +6,6 @@ import { IDataSchema } from '../gui-components/types'
 
 const Wrap = styled.div`
   font-size: 20px;
-  padding: 12px;
   height: 100%;
 `
 

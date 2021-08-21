@@ -9,21 +9,26 @@ import ContextMenu from '@src/designer/context-menu'
 import { useDesigner } from '../../stores'
 
 // type
-import { IComponentInstance } from '@src/designer/types'
+import { IComponentInstance, IComponentMeta } from '@src/designer/types'
 
 // css
 import './style.scss'
 
-const Editor = () => {
+interface IEditorProps {
+  className?: string
+}
+
+const Editor = (editorProps: IEditorProps) => {
+  const { className = '' } = editorProps
   const {
     componentsInstance,
     componentsMeta,
     activeComponentIndex,
     updateComponent,
-    setIsClickComponent,
     setActiveComponentIndex,
     showContextMenu,
     hideContextMenu,
+    scale,
   } = useDesigner()
   const [markLinkState, setMarkLinkState] = useState<{
     curComponentStyle: IShapeStyleType
@@ -42,10 +47,9 @@ const Editor = () => {
   const onDragStart = useCallback(
     (index: number) => {
       console.log('onDragStart')
-      setIsClickComponent(true)
       setActiveComponentIndex(index)
     },
-    [setActiveComponentIndex, setIsClickComponent]
+    [setActiveComponentIndex]
   )
 
   const onDragEnd = useCallback(
@@ -89,7 +93,6 @@ const Editor = () => {
     (e) => {
       e.stopPropagation()
       e.preventDefault()
-      console.log('onContextMenu')
 
       // 计算菜单相对于编辑器的位移
       let target = e.target
@@ -98,20 +101,18 @@ const Editor = () => {
       while (target instanceof SVGElement) {
         target = target.parentNode
       }
-
       while (!target.className.includes('editor-wrap')) {
         left += target.offsetLeft
         top += target.offsetTop
         target = target.parentNode
       }
-      showContextMenu(top, left)
+
+      showContextMenu(top * scale, left * scale)
     },
-    [showContextMenu]
+    [showContextMenu, scale]
   )
 
-  const onRootMouseDown = useCallback((index: number, e: any) => {
-    e.stopPropagation()
-    setIsClickComponent(true)
+  const onRootMouseDown = useCallback((index: number) => {
     setActiveComponentIndex(index)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -129,6 +130,7 @@ const Editor = () => {
       ) {
         return
       }
+
       const offset = { [key]: value }
       const result = {
         curComponentStyle: {
@@ -147,86 +149,102 @@ const Editor = () => {
     () => componentsInstance.map((item) => item.box),
     [componentsInstance]
   )
+  const { component: Stage } = componentsMeta['stage'] as IComponentMeta
+
+  const rootComponentData = useMemo(() => {
+    return componentsInstance[0]
+  }, [componentsInstance])
 
   return (
-    <div
-      className="editor-wrap grid-wrap"
-      id="canvas-editor"
-      onContextMenu={onContextMenu}
-    >
-      {componentsInstance.map((item, index) => {
-        const { type, props, box, id, dataSource } = item
-        const { component: C, suspenseFallback = null } = componentsMeta[type]
-        // 根节点直接渲染，仅融合参数
-        if (type === 'root') {
-          return (
-            <C
-              key={id}
-              {...props}
-              width={box.width}
-              height={box.height}
-              onMouseDown={onRootMouseDown.bind(null, index)}
-              data={dataSource?.staticData}
-            />
-          )
-        }
-
-        const activeId =
-          activeComponentIndex !== undefined
-            ? componentsInstance[activeComponentIndex].id
-            : ''
-
-        return (
-          <Drag
-            scale={{ x: 0.5, y: 0.5 }}
-            container={'#canvas-editor'}
-            key={id}
-            isActive={id === activeId}
-            // shapeStyle={box}
-            shapeStyle={
-              shapeOffsetInfo && id === shapeOffsetInfo.id
-                ? shapeOffsetInfo.curComponentStyle
-                : box
+    <div className={className}>
+      <div className="editor-wrap">
+        <Stage
+          onContextMenu={onContextMenu}
+          id="canvas-editor"
+          onMouseDown={onRootMouseDown.bind(null, 0)}
+          onClick={() => {
+            hideContextMenu()
+          }}
+          scale={scale}
+          width={rootComponentData.box.width}
+          height={rootComponentData.box.height}
+          {...rootComponentData.props}
+        >
+          {componentsInstance.map((item, index) => {
+            const { type, props, box, id, dataSource } = item
+            const _componentsMeta = componentsMeta[type]
+            if (!_componentsMeta) {
+              return null
             }
-            onDragStart={() => {
-              onDragStart(index)
-            }}
-            onDrag={(shapeStyle, _type, isDownward, isRightward) => {
-              onDrag(id, shapeStyle, _type, isDownward, isRightward)
-            }}
-            onDragEnd={(dragBox) => {
-              onDragEnd(dragBox, id)
-            }}
-            onCLick={() => {
-              hideContextMenu()
-            }}
-          >
-            <Suspense fallback={suspenseFallback}>
-              <div
-                style={{ pointerEvents: 'none', width: '100%', height: '100%' }}
+
+            const { component: C, suspenseFallback = null } = _componentsMeta
+
+            if (type === 'stage') {
+              return null
+            }
+
+            const activeId =
+              activeComponentIndex !== undefined
+                ? componentsInstance[activeComponentIndex].id
+                : ''
+
+            return (
+              <Drag
+                scale={{ x: scale, y: scale }}
+                container={'#canvas-editor'}
+                key={id}
+                isActive={id === activeId}
+                shapeStyle={
+                  shapeOffsetInfo && id === shapeOffsetInfo.id
+                    ? shapeOffsetInfo.curComponentStyle
+                    : box
+                }
+                onDragStart={() => {
+                  onDragStart(index)
+                }}
+                onDrag={(shapeStyle, _type, isDownward, isRightward) => {
+                  onDrag(id, shapeStyle, _type, isDownward, isRightward)
+                }}
+                onDragEnd={(dragBox) => {
+                  onDragEnd(dragBox, id)
+                }}
+                onCLick={() => {
+                  hideContextMenu()
+                }}
               >
-                <C
-                  {...props}
-                  width={box.width}
-                  height={box.height}
-                  data={dataSource?.staticData}
-                />
-              </div>
-            </Suspense>
-          </Drag>
-        )
-      })}
-      <ContextMenu />
-      <MarkLine
-        diff={3}
-        getShapeOffset={getShapeOffset}
-        activeComponentIndex={activeComponentIndex!}
-        allComponentStyleList={allComponentStyleList}
-        curComponentStyle={markLinkState.curComponentStyle}
-        isDownward={markLinkState.isDownward}
-        isRightward={markLinkState.isRightward}
-        isShow={markLinkState.isShow}
-      />
+                <Suspense fallback={suspenseFallback}>
+                  <div
+                    style={{
+                      pointerEvents: 'none',
+                      width: '100%',
+                      height: '100%',
+                      userSelect: 'none',
+                    }}
+                  >
+                    <C
+                      {...props}
+                      width={box.width}
+                      height={box.height}
+                      data={dataSource?.staticData}
+                    />
+                  </div>
+                </Suspense>
+              </Drag>
+            )
+          })}
+          <MarkLine
+            diff={8}
+            getShapeOffset={getShapeOffset}
+            activeComponentIndex={activeComponentIndex!}
+            allComponentStyleList={allComponentStyleList}
+            curComponentStyle={markLinkState.curComponentStyle}
+            isDownward={markLinkState.isDownward}
+            isRightward={markLinkState.isRightward}
+            isShow={markLinkState.isShow}
+          />
+        </Stage>
+        <ContextMenu />
+      </div>
     </div>
   )
 }

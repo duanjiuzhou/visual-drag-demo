@@ -3,8 +3,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 export const defaultRootInstance: IComponentInstance = {
-  id: 'root',
-  type: 'root', // 组件名称
+  id: 'stage',
+  type: 'stage', // 组件名称
   name: '舞台',
   version: '0.1.0',
   box: {
@@ -27,21 +27,31 @@ interface IProps {
   children?: React.ReactNode
   onClick?: () => void
   onMouseDown?: () => void
+  onContextMenu?: () => void
+  scale?: number
+  className?: string
 }
 
-const Wrap = styled.div<IProps>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  ${(props) => `
-    width:${props.width}px;
-    height:${props.height}px;
-    background-color:${props.backgroundColor};
-  `};
+const Wrap = styled.div`
+  position: relative;
+  transform-origin: 0 0;
 `
 
-function RootWrap(props: IProps) {
-  return <Wrap {...props}>{props.children}</Wrap>
+function Stage(props: IProps) {
+  const { width, height, backgroundColor, scale = 1, ...rest } = props
+  return (
+    <Wrap
+      {...rest}
+      style={{
+        width,
+        height,
+        backgroundColor,
+        transform: `scale(${scale}`,
+      }}
+    >
+      {props.children}
+    </Wrap>
+  )
 }
 
-export default RootWrap
+export default Stage

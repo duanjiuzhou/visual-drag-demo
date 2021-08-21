@@ -1,8 +1,14 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, lazy } from 'react'
 import { createContainer } from 'unstated-next'
-import { defaultRootInstance } from '../designer-components/root-wrap';
 import { IDesignerMode, IComponentInstance, IComponentsMeta, IDesignerProps } from '../types';
 import { uuid } from '../utils';
+
+import { defaultRootInstance } from '../designer-components/stage';
+import StageConfig from '../designer-components/stage/config'
+
+const Stage = lazy(
+    () => import(/* webpackChunkName: "stage" */ '../designer-components/stage')
+)
 
 const initialState: IDesignerProps = {
     mode: "show",
@@ -12,25 +18,36 @@ const initialState: IDesignerProps = {
 
 // 补充根节点
 const initInstances = (instances: IComponentInstance[]) => {
-    if (instances.length === 0 || instances[0].type !== "root") {
+    if (instances.length === 0 || instances[0].type !== "stage") {
         instances.unshift(defaultRootInstance);
     }
     return instances;
 };
 
+// 补充组件元数据
+const initComponentsMeta = (meta: IComponentsMeta) => {
+    if (!meta['stage']) {
+        meta.stage = {
+            ...StageConfig,
+            component: Stage,
+        }
+    }
+    return meta;
+};
+
 function Designer(state = initialState) {
     // designer状态，edit编辑态，show展示态
     const [mode, setMode] = useState<IDesignerMode>(state.mode || "show");
+    const [scale, setsScale] = useState(1);
     // 组件实例列表
     const [componentsInstance, setComponentsInstance] = useState<IComponentInstance[]>(initInstances(state.componentsInstance || []));
     // 组件元数据
     const [componentsMeta, setComponentsMeta] = useState<IComponentsMeta>(
-        state.componentsMeta || {}
+        initComponentsMeta(state.componentsMeta || {})
     );
     // 当前激活的组件索引，0为根节点
-    const [activeComponentIndex, setActiveComponentIndex] = useState<number | undefined>(0);
-    // 组件是否处于点击状态
-    const [isClickComponent, setIsClickComponent] = useState(false)
+    const [activeComponentIndex, setActiveComponentIndex] = useState<number>(0);
+
     // 右击菜单数据
     const [contextMenuState, setContextMenuState] = useState({
         top: 0,
@@ -50,7 +67,6 @@ function Designer(state = initialState) {
     // 更新指定组件
     const updateComponent = useCallback((id: string, c: Partial<IComponentInstance>) => {
         console.log('更新指定组件', c);
-
         setComponentsInstance((_) => {
             const index = _.findIndex((item) => item.id === id);
             if (index === -1) {
@@ -61,6 +77,17 @@ function Designer(state = initialState) {
             return [..._];
         });
     }, []);
+
+    const updateScale = useCallback((value) => {
+        let _ = value
+        if (value < 0.2) {
+            _ = 0.2
+        }
+        if (value > 2) {
+            _ = 2
+        }
+        setsScale(_);
+    }, [])
 
     const activeComponent = useMemo(
         () =>
@@ -87,9 +114,10 @@ function Designer(state = initialState) {
         updateComponent, addComponent,
         componentsMeta, setComponentsMeta,
         activeComponentIndex, setActiveComponentIndex,
-        isClickComponent, setIsClickComponent,
         contextMenuState, hideContextMenu, showContextMenu,
         activeComponent,
+        scale,
+        updateScale
     }
 }
 

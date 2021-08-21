@@ -4,13 +4,10 @@ import styled from 'styled-components'
 
 const CollapseReset = styled(Collapse)`
   .site-collapse-custom-panel {
-    margin-bottom: 24px;
+    margin-bottom: 10px;
     overflow: hidden;
     border: 0px;
     border-radius: 2px;
-  }
-  & > .ant-collapse-item > .ant-collapse-header {
-    padding-left: 80px;
   }
 `
 const GroupControl: FC<{ name: string; isOpen: boolean }> = ({
@@ -20,7 +17,11 @@ const GroupControl: FC<{ name: string; isOpen: boolean }> = ({
 }) => {
   return (
     <CollapseReset bordered={false} defaultActiveKey={isOpen ? '1' : undefined}>
-      <Collapse.Panel header={name} key="1" className="site-collapse-custom-panel">
+      <Collapse.Panel
+        header={name}
+        key="1"
+        className="site-collapse-custom-panel"
+      >
         {children}
       </Collapse.Panel>
     </CollapseReset>

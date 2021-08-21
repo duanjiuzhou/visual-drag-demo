@@ -62,7 +62,7 @@ const config: IComponentConfig = {
       name: "图片链接",
       type: "text",
       defaultValue:
-        "https://tianrang-tscc.oss-cn-hangzhou.aliyuncs.com/static/media/homebg2.bd013256.png",
+        "https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/0189ed0e459221e36d1fe35ef018ea39~300x300.images",
     },
     target: {
       name: "是否新开窗口",

@@ -7,7 +7,6 @@ import { unFlatten, flatten, getDefaultValue } from '../../utils'
 
 const Wrap = styled.div`
   font-size: 20px;
-  padding: 12px;
   height: 100%;
 `
 
