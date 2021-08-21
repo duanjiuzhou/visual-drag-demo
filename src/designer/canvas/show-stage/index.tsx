@@ -21,7 +21,7 @@ const ShowStage = () => {
       height={rootComponentData.box.height}
       {...rootComponentData.props}
     >
-      {componentsInstance.map((item, index) => {
+      {componentsInstance.map((item) => {
         const { type, props, box, id, dataSource } = item
         const _componentsMeta = componentsMeta[type]
         if (!_componentsMeta) {
@@ -35,7 +35,7 @@ const ShowStage = () => {
         }
 
         return (
-          <Suspense fallback={suspenseFallback} key={`${id}${index}`}>
+          <Suspense fallback={suspenseFallback} key={`${id}`}>
             <div
               style={{
                 position: 'absolute',
