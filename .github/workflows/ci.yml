@@ -12,7 +12,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Install and Build
-        env: false
         run: |
           yarn install
           yarn build
