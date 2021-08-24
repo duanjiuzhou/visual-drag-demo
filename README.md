@@ -18,3 +18,7 @@
 - [ ] 锁定
 - [ ] 撤消、重做
 - [ ] 预览、保存代码
+
+## 部署
+
+action 编译报错问题参考 [链接](https://dev.to/kapi1/solved-treating-warnings-as-errors-because-of-process-env-ci-true-bk5)
