@@ -28,4 +28,4 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build
           CLEAN: true
-          TARGET_FOLDER: visual-drag-demo
+ #         TARGET_FOLDER: visual-drag-demo
