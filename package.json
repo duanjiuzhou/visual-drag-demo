@@ -13,6 +13,7 @@
     "javascript",
     "ui"
   ],
+  "homepage": "https://duanjiuzhou.github.io/visual-drag-demo",
   "dependencies": {
     "@ant-design/charts": "^1.1.19",
     "@monaco-editor/react": "^4.1.0",
