@@ -22,3 +22,5 @@
 ## 部署
 
 action 编译报错问题参考 [链接](https://dev.to/kapi1/solved-treating-warnings-as-errors-because-of-process-env-ci-true-bk5)
+
+空页面现象问题参考 [链接](https://blog.zhangbing.site/2021/04/16/deploying-a-react-app-using-github-pages-and-github-actions/)
