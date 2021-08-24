@@ -33,15 +33,15 @@
     background-color: #13171e;
     background-image: repeating-linear-gradient(
         0deg,
-        rgb(0 0 0 / 4%),
-        rgb(242 242 242 / 8%) 1px,
+        rgba(0, 0, 0, 0.04),
+        rgba(242, 242, 242, 0.08) 1px,
         transparent 1px,
         transparent 20px
       ),
       repeating-linear-gradient(
         -90deg,
         rgba(0, 0, 0, 0.04),
-        rgba(242 242 242 / 8%) 1px,
+        rgba(242, 242, 242, 0.08) 1px,
         transparent 1px,
         transparent 20px
       );
