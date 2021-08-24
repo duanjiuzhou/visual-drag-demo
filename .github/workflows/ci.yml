@@ -29,3 +29,4 @@ jobs:
           FOLDER: build
           CLEAN: true
           TARGET_FOLDER: visual-drag-demo
+          REPOSITORY_NAME: duanjiuzhou/duanjiuzhou.github.io
