@@ -31,7 +31,6 @@ interface IProps extends React.HTMLAttributes<HTMLElement> {
   height?: number
   opacity?: number
   alt?: string
-  imgUrl?: string
   imgRepeatType?: ImgRepeatType
   url?: string
   target?: boolean
@@ -43,7 +42,6 @@ const Image = (props: IProps) => {
     width,
     height,
     opacity,
-    imgUrl = 'https://tianrang-tscc.oss-cn-hangzhou.aliyuncs.com/static/media/homebg2.bd013256.png',
     imgRepeatType = ImgRepeatType.不重复拉伸满,
     url,
     alt,
@@ -56,7 +54,7 @@ const Image = (props: IProps) => {
     width,
     height,
     opacity,
-    backgroundImage: `url(${imgUrl})`,
+    backgroundImage: `url(${url})`,
     ...config[imgRepeatType],
     backgroundSize: 'contain',
   }
