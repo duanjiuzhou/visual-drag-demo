@@ -1,30 +1,29 @@
-name: GitHub Actions Build and Deploy
+name: Build and Deploy
+
+# 当有新push或者pr时运行
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 jobs:
+  # 一项叫做build-and-deploy的任务
   build-and-deploy:
+    # 在最新版的Ubuntu系统下运行
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [15.x]
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2 # 来自官方脚本：https://github.com/marketplace/actions/checkout
+
       - name: Install and Build
         run: |
           npm install
           npm run build
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@releases/v3 # 脚本来自： https://github.com/JamesIves/github-pages-deploy-action
         with:
-          GITHUB_TOKEN: ${{ secrets.VISUAL_DRAG_DEMO }}
-          BRANCH: master
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          BRANCH: gh-pages
           FOLDER: build
-          CLEAN: true
-          REPOSITORY_NAME: duanjiuzhou/duanjiuzhou.github.io
-          TARGET_FOLDER: visual-drag-demo
