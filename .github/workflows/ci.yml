@@ -27,4 +27,5 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: build
-          clean: true
+          CLEAN: true
+          TARGET_FOLDER: visual-drag-demo
