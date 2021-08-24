@@ -19,11 +19,12 @@ jobs:
 
       - name: Install and Build
         run: |
-          npm install
-          npm run build
+          yarn install
+          yarn run build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3 # 脚本来自： https://github.com/JamesIves/github-pages-deploy-action
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
           FOLDER: build
+          clean: true
