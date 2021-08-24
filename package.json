@@ -44,7 +44,7 @@
   },
   "scripts": {
     "start": "PUBLIC_URL=/ react-app-rewired start",
-    "build": "react-app-rewired --max_old_space_size=4096 build",
+    "build": "PUBLIC_URL=/ react-app-rewired --max_old_space_size=4096 build",
     "test": "react-app-rewired test --env=jsdom",
     "cz": "git-cz"
   },
