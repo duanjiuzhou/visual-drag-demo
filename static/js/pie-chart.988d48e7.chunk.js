@@ -1,0 +1,1 @@
+(this["webpackJsonpvisual-drag-demo"]=this["webpackJsonpvisual-drag-demo"]||[]).push([[5],{712:function(a,t,e){"use strict";e.r(t),e.d(t,"PieChartConfig",(function(){return s.a}));var n=e(63),r=e(721),i=e(2);var s=e(209);t.default=function(a){return Object(i.jsx)(r.a,Object(n.a)(Object(n.a)({},a),{},{data:a.data||[]}))}}}]);

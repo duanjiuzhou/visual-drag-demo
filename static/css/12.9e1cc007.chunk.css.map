@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/routes/Board/style.scss"],"names":[],"mappings":"AAAA,KACE,UAAW,CACX,qBAAsB","file":"12.9e1cc007.chunk.css","sourcesContent":["body {\n  color: #000;\n  background-color: #fff;\n}\n"]}
