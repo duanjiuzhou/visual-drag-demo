@@ -11,7 +11,11 @@
     display: flex;
   }
   .icon {
+    margin-right: 10px;
     font-size: 18px;
+  }
+  .icon-align {
+    vertical-align: sub;
   }
   .handle-wrap {
     display: block;

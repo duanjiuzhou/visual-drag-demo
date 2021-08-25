@@ -3,9 +3,9 @@ name: Build and Deploy
 # 当有新push或者pr时运行
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   # 一项叫做build-and-deploy的任务
@@ -28,4 +28,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build
           CLEAN: true
-#          TARGET_FOLDER: visual-drag-demo

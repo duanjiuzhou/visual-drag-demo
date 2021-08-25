@@ -8,24 +8,14 @@ import Slider from './slider'
 import { Designer, ConfigurationPanel, Canvas } from '@src/designer'
 import componentsMeta from '@src/designer/components-meta'
 
-// utils
-import { getUrlParam } from '@src/utils'
-
 // css
 import './style.scss'
 
 const Layout = () => {
-  const id = getUrlParam('id')
-
   const componentsInstance = useMemo(() => {
-    if (!id) {
-      return []
-    }
-    const result = localStorage.getItem(id)
+    const result = localStorage.getItem('designerData')
     return result ? JSON.parse(result) : []
-  }, [id])
-
-  console.log('id', id)
+  }, [])
 
   return (
     <div className="layout-wrap">

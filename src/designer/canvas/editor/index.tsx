@@ -40,6 +40,7 @@ const Editor = (editorProps: IEditorProps) => {
     curComponentStyle: IShapeStyleType
     id: string
   }>()
+  const [isDrag, setIsDrag] = useState(false)
 
   const shapeOffsetInfoRef = useRef(shapeOffsetInfo)
   const idRef = useRef<string>()
@@ -195,11 +196,12 @@ const Editor = (editorProps: IEditorProps) => {
                 key={id}
                 isActive={id === activeId}
                 shapeStyle={
-                  shapeOffsetInfo && id === shapeOffsetInfo.id
+                  isDrag && shapeOffsetInfo && id === shapeOffsetInfo.id
                     ? shapeOffsetInfo.curComponentStyle
                     : box
                 }
                 onDragStart={() => {
+                  setIsDrag(true)
                   onDragStart(index)
                 }}
                 onDrag={(shapeStyle, _type, isDownward, isRightward) => {
@@ -207,6 +209,7 @@ const Editor = (editorProps: IEditorProps) => {
                 }}
                 onDragEnd={(dragBox) => {
                   onDragEnd(dragBox, id)
+                  setIsDrag(false)
                 }}
                 onCLick={() => {
                   hideContextMenu()
@@ -219,6 +222,7 @@ const Editor = (editorProps: IEditorProps) => {
                       width: '100%',
                       height: '100%',
                       userSelect: 'none',
+                      opacity: box.opacity,
                     }}
                   >
                     <C
@@ -233,7 +237,7 @@ const Editor = (editorProps: IEditorProps) => {
             )
           })}
           <MarkLine
-            diff={8}
+            diff={4}
             getShapeOffset={getShapeOffset}
             activeComponentIndex={activeComponentIndex!}
             allComponentStyleList={allComponentStyleList}

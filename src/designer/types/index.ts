@@ -45,6 +45,7 @@ export interface IComponentInstance<T = any> {
         top: number;
         zIndex: number;
         rotate: number;
+        opacity?: number;
     }; // 定位参数 
     style?: {
         style: React.CSSProperties;

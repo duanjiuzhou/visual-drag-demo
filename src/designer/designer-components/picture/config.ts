@@ -62,7 +62,7 @@ const config: IComponentConfig = {
       name: "图片链接",
       type: "text",
       defaultValue:
-        "https://sf6-ttcdn-tos.pstatp.com/img/user-avatar/0189ed0e459221e36d1fe35ef018ea39~300x300.images",
+        "https://dummyimage.com/600x400/f58ef5/f7f7f7",
     },
     target: {
       name: "是否新开窗口",

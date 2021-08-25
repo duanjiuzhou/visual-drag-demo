@@ -1,44 +1,49 @@
-import { Link } from 'react-router-dom'
-
+import { useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
 // rc
-import { ArrowLeftOutlined, SendOutlined } from '@ant-design/icons'
 import { message } from 'antd'
+import { SendOutlined, DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import ComponentList from './component-list'
 
 import { useDesigner } from '@src/designer'
 
 // path
-import { BASE_URL, SHOW_URL } from '@src/constants/path'
-
-// utils
-import { getUrlParam } from '@src/utils'
+import { SHOW_URL } from '@src/constants/path'
 
 // css
 import './style.scss'
 
 const Header = () => {
-  const id = getUrlParam('id')
-  const { componentsInstance } = useDesigner()
+  const { componentsInstance, clearCanvas } = useDesigner()
+  const history = useHistory()
+  const onSaveClick = useCallback(() => {
+    localStorage.setItem('designerData', JSON.stringify(componentsInstance))
+    message.success('保存成功')
+  }, [componentsInstance])
 
-  const onClick = () => {
-    if (!id) {
-      message.warning('当前路由id无数据，无法发布。')
-      return
-    }
-    localStorage.setItem(id, JSON.stringify(componentsInstance))
-    window.open(`${SHOW_URL}?id=${id}`)
-  }
+  const onDeleteClick = useCallback(() => {
+    clearCanvas()
+    message.success('删除成功')
+  }, [clearCanvas])
+
+  const onSendClick = useCallback(() => {
+    localStorage.setItem('designerData', JSON.stringify(componentsInstance))
+    history.push(SHOW_URL)
+  }, [componentsInstance, history])
 
   return (
     <div className="wrap">
       <div className="component-warp">
-        <Link to={BASE_URL}>
-          <ArrowLeftOutlined className="icon" />
-        </Link>
         <ComponentList />
       </div>
       <div className="handle-wrap">
-        <span onClick={onClick} className="release-wrap">
+        <span onClick={onDeleteClick} className="release-wrap" title="清空画布">
+          <DeleteOutlined className="icon icon-align" />
+        </span>
+        <span onClick={onSaveClick} className="release-wrap" title="保存">
+          <SaveOutlined className="icon icon-align" />
+        </span>
+        <span onClick={onSendClick} className="release-wrap" title="发布预览">
           <SendOutlined className="icon release" />
         </span>
       </div>

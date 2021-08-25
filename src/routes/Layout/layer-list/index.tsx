@@ -37,7 +37,6 @@ const ComponentListWrap = styled.div`
   position: relative;
   width: 200px;
   height: 100%;
-  overflow-y: auto;
   color: #fff;
   background-color: #202327;
   .label {
@@ -49,6 +48,7 @@ const ComponentListWrap = styled.div`
   }
   .layer-list {
     flex: 1;
+    height: calc(100% - 40px);
     padding: 0;
     overflow-y: auto;
     transition: all linear 0.2s;
@@ -56,7 +56,7 @@ const ComponentListWrap = styled.div`
       position: relative;
       display: flex;
       align-items: center;
-      height: 44px;
+      height: 30px;
       padding: 0 8px;
       list-style: none;
       outline: none;
@@ -67,6 +67,18 @@ const ComponentListWrap = styled.div`
     }
     .com-checked {
       background: rgb(36, 145, 247);
+    }
+    &::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(144, 146, 152, 0.46);
+      border-radius: 5px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 5px;
     }
   }
 `

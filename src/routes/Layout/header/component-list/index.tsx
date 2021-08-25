@@ -102,9 +102,9 @@ const ComponentItem = (props: IComponentMeta & { closeFunc: () => void }) => {
       defaultValue.width || 150,
       defaultValue.height || 150,
     ]
+
     closeFunc()
 
-    console.log(closeFunc)
     addComponent({
       id: '',
       type: name,
@@ -117,8 +117,9 @@ const ComponentItem = (props: IComponentMeta & { closeFunc: () => void }) => {
         left: center[0] - width / 2,
         zIndex: 1,
         rotate: 0,
+        opacity: 1,
       }, // 定位参数
-      props: { ...unFlatten(defaultValue), width, height }, //  根据组件定制
+      props: { ...unFlatten(defaultValue) }, //  根据组件定制
       dataSource: dataSchema || {},
     })
   }, [props, componentsMeta, componentsInstance, addComponent])
@@ -240,6 +241,7 @@ const ComponentList = () => {
       {uiConfig
         ? uiConfig.map((item) => (
             <Dropdown
+              visible={selectedCategory === item.name}
               onVisibleChange={(visible: boolean) => {
                 setSelectedCategory(item.name)
                 if (!visible) {
