@@ -86,8 +86,8 @@ function Designer(state = initialState) {
         if (value < 0.2) {
             _ = 0.2
         }
-        if (value > 2) {
-            _ = 2
+        if (value > 5) {
+            _ = 5
         }
         setsScale(_);
     }, [])

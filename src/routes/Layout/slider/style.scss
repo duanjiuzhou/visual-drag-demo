@@ -23,5 +23,18 @@
     display: inline-block;
     width: 45px;
     text-align: center;
+    &:hover {
+      background: rgba(72, 77, 89, 0.69);
+    }
+  }
+  .ant-tooltip-inner {
+    .list {
+      width: 80px;
+    }
+    .item {
+      &:hover {
+        background: rgba(72, 77, 89, 0.69);
+      }
+    }
   }
 }

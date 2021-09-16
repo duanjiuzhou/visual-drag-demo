@@ -28,3 +28,4 @@ jobs:
           BRANCH: gh-pages
           FOLDER: build
           CLEAN: true
+# 参考配置 https://sourcegraph.com/github.com/ly525/luban-h5/-/blob/.github/workflows/deploy-docs.yml
